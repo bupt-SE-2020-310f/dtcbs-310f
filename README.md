@@ -2,7 +2,7 @@
 A distribute temperature control billing system for software engineering course at BUPT.
 
 # Development demand
-Once you edit a file, you shall add your name in a particular at the begining of the file.
+Once you edit a file, you shall add your name in a particular way at the beginning of the file.
 
 You should commit your code to your own branches, and I'll merge them to the master later.
 
