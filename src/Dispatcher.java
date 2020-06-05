@@ -15,7 +15,7 @@
 public class Dispatcher extends HttpServer{
     int defaultTargetTemp;
 
-    public static void main(String[] args){
+    public static void main1(String[] args){
         System.out.printf("%s\n", "Hello World!");
     }
 
