@@ -9,7 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class Room {
-    public static void main(String[] args){
+    public static void main5(String[] args){
         HttpURLConnection connection = null;
         try {
             URL url = new URL("https://www.runoob.com/java/java-url-processing.html");
