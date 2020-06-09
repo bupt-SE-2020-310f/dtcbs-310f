@@ -27,34 +27,34 @@ public class Client {
 		float changeTemp;
 		float needMinute;
 		float electricQuantity;
-		if(mode == 1) {//制热
+		if(mode == 1) {//heating
 			changeTemp = this.targetTemp - this.currentTemp;
 			needMinute = (float) (changeTemp / 0.5);
-			if(speed == 3) {//高
+			if(speed == 3) {//H
 				electricQuantity = needMinute / 1;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 2) {//中
+			if(speed == 2) {//M
 				electricQuantity = needMinute / 2;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 1) {//低
+			if(speed == 1) {//L
 				electricQuantity = needMinute / 3;
 				feeRate = electricQuantity * 1;
 			}
 		}
-		else if(mode == 0) {//制冷
+		else if(mode == 0) {//refrigeration
 			changeTemp = this.currentTemp - this.targetTemp;
 			needMinute = (float) (changeTemp / 0.5);
-			if(speed == 3) {//高
+			if(speed == 3) {//H
 				electricQuantity = needMinute / 1;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 2) {//中
+			if(speed == 2) {//M
 				electricQuantity = needMinute / 2;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 1) {//低
+			if(speed == 1) {//L
 				electricQuantity = needMinute / 3;
 				feeRate = electricQuantity * 1;
 			}
