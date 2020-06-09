@@ -78,6 +78,12 @@ public class Dispatcher extends HttpServerSys{
             super();
         }
 
+        public StringEntity sendBack(JSONObject js){
+            return new StringEntity(
+                    js.toString(),
+                    ContentType.create("APPLICATION_JSON", "UTF-8"));
+        }
+
         public void handle(
                 final HttpRequest request,
                 final HttpResponse response,
@@ -99,16 +105,23 @@ public class Dispatcher extends HttpServerSys{
                     if (type.equals("fee")){
                         float[] values = new float[3];
                         JSONObject jsonFee = new JSONObject();
-                        jsonFee.put("status", 0);
+                        JSONObject jsonData = new JSONObject();
                         for(int i = 0; i < args.length; i++){
+                            //id & currentTemperature & changeTemperature
                             values[i] = Float.parseFloat(args[1].split("=")[1]);
                         }
-                        response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-                        StringEntity entity = new StringEntity(
-                                jsonFee.toString(),
-                                ContentType.create("APPLICATION_JSON", "UTF-8"));
-                        response.setEntity(entity);
-                        System.out.println("File " + " not found");
+                        /*
+                        do something here
+                         */
+                        jsonFee.put("status", 0);
+                        jsonFee.put("msg","成功");
+                        jsonData.put("fee", 4.05);
+                        jsonData.put("roomState", 0);
+                        jsonData.put("id", 5);
+                        jsonFee.put("data", jsonData);
+                        response.setStatusCode(HttpStatus.SC_OK);
+                        response.setEntity(sendBack(jsonFee));
+                        System.out.println("Fee request " + " Room 5");
                     }
                 }
                 else if (method.equals("PUT")) {
@@ -117,44 +130,99 @@ public class Dispatcher extends HttpServerSys{
                         for(int i = 0; i < args.length; i++){
                             values[i] = Float.parseFloat(args[1].split("=")[1]);
                         }
+                        /*
+                        do sth.
+                         */
+                        JSONObject jsonShutdown = new JSONObject();
+                        jsonShutdown.put("status", 0);
+                        jsonShutdown.put("msg", "成功");
+                        response.setStatusCode(HttpStatus.SC_OK);
+                        response.setEntity(sendBack(jsonShutdown));
+                        System.out.println("Shutdown " + " Room 5");
                     }
                     else if (type.equals("exit")){
                         float[] values = new float[1];
                         for(int i = 0; i < args.length; i++){
                             values[i] = Float.parseFloat(args[1].split("=")[1]);
                         }
+                        /*
 
-
+                         */
+                        JSONObject jsonExit = new JSONObject();
+                        jsonExit.put("status", 0);
+                        jsonExit.put("msg", "成功");
+                        response.setStatusCode(HttpStatus.SC_OK);
+                        response.setEntity(sendBack(jsonExit));
+                        System.out.println("Check out" + " Room 5");
                     }
                 }
                 else {  //POST Request
-                    if (type.equals("initial")){
+                    if (type.equals("initial")){//Check in
                         float[] values = new float[3];
                         for(int i = 0; i < args.length; i++){
                             values[i] = Float.parseFloat(args[1].split("=")[1]);
                         }
+                        /*
 
+                         */
+                        JSONObject jsonCheckIn = new JSONObject();
+                        JSONObject jsonData = new JSONObject();
+                        jsonCheckIn.put("status", 0);
+                        jsonCheckIn.put("msg", "成功");
+                        jsonData.put("id", 10);
+                        jsonData.put("highestTemperature", 24);
+                        jsonData.put("lowestTemperature", 16);
+                        jsonData.put("defaultFanSpeed", 1);
+                        jsonData.put("defaultTargetTemperature", 26);
+                        jsonCheckIn.put("data", jsonData);
+                        response.setStatusCode(HttpStatus.SC_OK);
+                        response.setEntity(sendBack(jsonCheckIn));
+                        System.out.println("Check in" + " Room 5");
                     }
                     else if (type.equals("service")){
                         float[] values = new float[3];
                         for(int i = 0; i < args.length; i++){
                             values[i] = Float.parseFloat(args[1].split("=")[1]);
                         }
+                        /*
 
+                         */
+                        JSONObject jsonExit = new JSONObject();
+                        jsonExit.put("status", 0);
+                        jsonExit.put("msg", "成功");
+                        response.setStatusCode(HttpStatus.SC_OK);
+                        response.setEntity(sendBack(jsonExit));
+                        System.out.println("Shutdown " + " Room 5");
                     }
                     else if (type.equals("temp")){
                         float[] values = new float[3];
                         for(int i = 0; i < args.length; i++){
                             values[i] = Float.parseFloat(args[1].split("=")[1]);
                         }
+                        /*
 
+                         */
+                        JSONObject jsonTemp = new JSONObject();
+                        jsonTemp.put("status", 0);
+                        jsonTemp.put("msg", "成功");
+                        response.setStatusCode(HttpStatus.SC_OK);
+                        response.setEntity(sendBack(jsonTemp));
+                        System.out.println("Adjust speed " + "room " + Float.toString(values[0]));
                     }
                     else if (type.equals("fan")){
                         float[] values = new float[3];
                         for(int i = 0; i < args.length; i++){
                             values[i] = Float.parseFloat(args[1].split("=")[1]);
                         }
+                        /*
 
+                         */
+                        JSONObject jsonFan = new JSONObject();
+                        jsonFan.put("status", 0);
+                        jsonFan.put("msg", "成功");
+                        response.setStatusCode(HttpStatus.SC_OK);
+                        response.setEntity(sendBack(jsonFan));
+                        System.out.println("Adjust speed " + "room " + Float.toString(values[0]));
                     }
                 }
             }
