@@ -47,7 +47,7 @@ import javax.swing.filechooser.FileSystemView;
  *
  * @since 4 April 2020
  */
-public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
+public class Dispatcher extends HttpServerSys {
     int defaultTargetTemp;
     HashMap<Long, Integer> roomId2id = new HashMap<>();
     Queue sQueue, wQueue;
@@ -206,23 +206,22 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
         return listReport;
     }
 
-    @Override
+    
     public float RequestFee(int roomId) {
         return sQueue.Get(String.valueOf(roomId)).fee;
     }
 
-    @Override
     public boolean RequestOff(int roomId) {
         return  !(sQueue.Pop(String.valueOf(roomId)) == null) ||
                 !(wQueue.Pop(String.valueOf(roomId)) == null);
     }
 
-    @Override
+    
     public boolean RequestOn(int roomId, float currentRoomTemp) {
         return false;
     }
 
-    @Override
+    
     public void SetPara(int mode, int tempHighLimit, int tempLowLimit,
                         int defaultTargetTemp, int feeRateH,
                         int feeRateM, int feeRateL) {
@@ -231,19 +230,19 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                     feeRateM, feeRateL);
     }
 
-    @Override
+    
     public boolean StartUp() {
         return false;
     }
 
-    @Override
+    
     public void ChangeFanSpeed(int roomId, int fanSpeed) {
         if(sQueue.IsIn(String.valueOf(roomId))){
             sQueue.ChangeSpeed(String.valueOf(roomId), fanSpeed);
         }
     }
 
-    @Override
+    
     public void ChangeTargetTemp(int roomId, int targetTemp) {
         if(sQueue.IsIn(String.valueOf(roomId))) {
             //sQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
@@ -256,7 +255,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
          */
     }
 
-    @Override
+    
     public List<RoomState> CheckRoomState(List<Integer> listRoomId) {
         return null;
     }
@@ -300,12 +299,12 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
 			return false;
     }
 
-    @Override
+    
     public boolean PowerOn() {
         return false;
     }
 
-    @Override
+    
     public boolean PrintRDR(int roomId, Time dateIn, Time dateOut) {
         return false;
     }
@@ -634,7 +633,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
         httpServer.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
+            
             public void run() {
                 httpServer.shutdown(5, TimeUnit.SECONDS);
             }
