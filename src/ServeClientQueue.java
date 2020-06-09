@@ -12,28 +12,12 @@ import java.util.List;
  */
 public class ServeClientQueue extends Queue {
 
-    public ServeClientQueue(Dispatcher dispatcher, Queue tother) {
-        super(dispatcher, tother);
-    }
-
     /**
-     * Get information of rooms listed in listRoomId.
-     *
-     * @param listRoomId the list of roomId
-     * @return the list of room information;
-     *          if room is not in this queue, its information is null
-     */
-    public List<RoomState> CheckRoomState(List<String> listRoomId) {
-        List<RoomState> roomStateList = new ArrayList<>();
-        for (String roomId : listRoomId) {
-            roomStateList.add(this.roomInfo.get(roomId).GetRoomState());
-        }
-        return roomStateList;
-    }
-
-    /**
-     * Get an identifier of room,
-     * this room has the lowest priority and lower than level.
+     * Get the roomId of target room,
+     * the room is binded with a client having the lowest priority and lower than level.
+     * When some clients have equal priority, select the first one,
+     * because it has the longest serve-time.
+     * Priority can be represented by fanSpeed here.
      *
      * @param level the limit priority
      * @return room identifier normally, null if no such room exits
@@ -42,12 +26,17 @@ public class ServeClientQueue extends Queue {
         int low = level;
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
-            Client client = this.roomInfo.get(roomId);
-            if (client.priority < low) {
-                low = client.priority;
+            Client client = this.Get(roomId);
+            if (client.fanSpeed < low) {
+                low = client.fanSpeed;
                 id = roomId;
             }
         }
         return id;
+    }
+
+    @Override
+    public List<RoomState> CheckRoomState(List<String> listRoomId) {
+        return super.CheckRoomState(listRoomId);
     }
 }
