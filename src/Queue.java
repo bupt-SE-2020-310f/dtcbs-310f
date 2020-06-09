@@ -1,8 +1,4 @@
-import struct.RoomState;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,6 +65,8 @@ public class Queue {
         this.Add(rmId2, client2);
         this.tother.Add(rmId1, client1);
     }
+
+    public Client Get(String rmId) { return this.roomInfo.get(rmId); }
 
     /**
      * Check whether client at roomId is in this queue.

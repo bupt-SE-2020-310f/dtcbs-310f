@@ -11,20 +11,18 @@ import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
+import struct.RoomState;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.DatagramSocketImplFactory;
 import java.net.URLDecoder;
+import java.sql.*;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,50 +47,18 @@ import javax.swing.filechooser.FileSystemView;
  *
  * @since 4 April 2020
  */
-public class Dispatcher extends HttpServerSys{
+public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
     int defaultTargetTemp;
-
-    public static void main(String[] args) throws Exception {
-
-        int port = 8080;
-
-        if (args.length >= 1) {
-            port = Integer.parseInt(args[0]);
-        }
-
-        SocketConfig socketConfig = SocketConfig.custom()
-                .setSoTimeout(15000)
-                .setTcpNoDelay(true)
-                .build();
-
-        final HttpServer server = ServerBootstrap.bootstrap()
-                .setListenerPort(port)
-                .setServerInfo("Server/0.1")
-                .setSocketConfig(socketConfig)
-                .setExceptionLogger(new HttpServerSys.StdErrorExceptionLogger())
-                .registerHandler("*", new Dispatcher.HttpHandler())
-                .create();
-
-        server.start();
-        server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                server.shutdown(5, TimeUnit.SECONDS);
-            }
-        });
+    Queue sQueue, wQueue;
+    Server core;
+    Dispatcher(){
+        super();
+        core = new Server(0, 25, 18,
+                22, 1, (float) 0.5, (float) 1/3);
+        sQueue = new ServeClientQueue(this, wQueue);
+        wQueue = new WaitClientQueue(this, sQueue);
     }
-    public void ChangeFanSpeed(String roomId, int fanSpeed){
 
-    }
-    
-
-    public void ChangeTargetTemp(String roomId, int targetTemp){
-    }
-    
-    
-    
     public boolean PrintReport(int roomId, String dateIn, String dateOut) {
     	List<Report> listReport = new ArrayList<Report>();
     	
@@ -237,7 +203,62 @@ public class Dispatcher extends HttpServerSys{
 
         return listReport;
     }
-    
+
+    @Override
+    public float RequestFee(int roomId) {
+        return sQueue.Get(String.valueOf(roomId)).fee;
+    }
+
+    @Override
+    public boolean RequestOff(int roomId) {
+        return  !(sQueue.Pop(String.valueOf(roomId)) == null) ||
+                !(wQueue.Pop(String.valueOf(roomId)) == null);
+    }
+
+    @Override
+    public boolean RequestOn(int roomId, float currentRoomTemp) {
+        return false;
+    }
+
+    @Override
+    public void SetPara(int mode, int tempHighLimit, int tempLowLimit,
+                        int defaultTargetTemp, int feeRateH,
+                        int feeRateM, int feeRateL) {
+        core.SetPara(mode, tempHighLimit, tempLowLimit,
+                    defaultTargetTemp, feeRateH,
+                    feeRateM, feeRateL);
+    }
+
+    @Override
+    public boolean StartUp() {
+        return false;
+    }
+
+    @Override
+    public void ChangeFanSpeed(int roomId, int fanSpeed) {
+        if(sQueue.IsIn(String.valueOf(roomId))){
+            sQueue.ChangeSpeed(String.valueOf(roomId), fanSpeed);
+        }
+    }
+
+    @Override
+    public void ChangeTargetTemp(int roomId, int targetTemp) {
+        if(sQueue.IsIn(String.valueOf(roomId))) {
+            sQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
+        }
+        else {
+            wQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
+        }
+        /*
+        Improve needed
+         */
+    }
+
+    @Override
+    public List<RoomState> CheckRoomState(List<Integer> listRoomId) {
+        return null;
+    }
+
     public boolean DeleteReport(int ReportId, String date) {
             Connection connection = null;
             PreparedStatement preparedStatement = null;
@@ -276,7 +297,21 @@ public class Dispatcher extends HttpServerSys{
             }
 			return false;
     }
-    
+
+    @Override
+    public boolean PowerOn() {
+        return false;
+    }
+
+    @Override
+    public boolean PrintRDR(int roomId, Time dateIn, Time dateOut) {
+        return false;
+    }
+
+    public Invoice QueryInvoice(int roomId, String StringIn, String StringOut) {
+        return null;
+    }
+
     public boolean PrintRDR(int roomId, String dateIn, String dateOut) {
     	List<RDR> listReport = new ArrayList<RDR>();
     	
@@ -418,9 +453,10 @@ public class Dispatcher extends HttpServerSys{
     }
 
     static class HttpHandler implements HttpRequestHandler {
-
-        public HttpHandler() {
+        Dispatcher controller = null;
+        public HttpHandler(Dispatcher dispatcher) {
             super();
+            controller = dispatcher;
         }
 
         public StringEntity sendBack(JSONObject js) {
@@ -567,4 +603,38 @@ public class Dispatcher extends HttpServerSys{
             }
         }
     }
+
+    public static void main(String[] args) throws Exception {
+
+        int port = 8080;
+        Dispatcher server = new Dispatcher();
+
+        if (args.length >= 1) {
+            port = Integer.parseInt(args[0]);
+        }
+
+        SocketConfig socketConfig = SocketConfig.custom()
+                .setSoTimeout(15000)
+                .setTcpNoDelay(true)
+                .build();
+
+        final HttpServer httpServer = ServerBootstrap.bootstrap()
+                .setListenerPort(port)
+                .setServerInfo("Server/0.1")
+                .setSocketConfig(socketConfig)
+                .setExceptionLogger(new HttpServerSys.StdErrorExceptionLogger())
+                .registerHandler("*", new Dispatcher.HttpHandler())
+                .create();
+
+        httpServer.start();
+        httpServer.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                httpServer.shutdown(5, TimeUnit.SECONDS);
+            }
+        });
+    }
+
 }

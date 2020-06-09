@@ -19,6 +19,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -119,14 +120,18 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="395" y="125" key="#Inspections" timestamp="1591419964378">
+    <state x="395" y="125" key="#Inspections" timestamp="1591694906033">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state x="395" y="125" key="#Inspections/0.30.1536.834@0.30.1536.834" timestamp="1591419964378" />
+    <state x="395" y="125" key="#Inspections/0.30.1536.834@0.30.1536.834" timestamp="1591694906033" />
     <state x="223" y="102" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1591257418802">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
     <state x="223" y="102" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.30.1536.834@0.30.1536.834" timestamp="1591257418802" />
+    <state x="574" y="152" key="#com.intellij.ide.util.MemberChooser" timestamp="1591691219566">
+      <screen x="0" y="30" width="1536" height="834" />
+    </state>
+    <state x="574" y="152" key="#com.intellij.ide.util.MemberChooser/0.30.1536.834@0.30.1536.834" timestamp="1591691219566" />
     <state x="498" y="236" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1591256506553">
       <screen x="0" y="30" width="1536" height="834" />
     </state>

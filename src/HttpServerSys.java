@@ -44,8 +44,6 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class HttpServerSys {
 
-
-
     static class StdErrorExceptionLogger implements ExceptionLogger {
 
         @Override

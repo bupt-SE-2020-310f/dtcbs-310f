@@ -16,10 +16,10 @@ public class Client {
 	float feeRate;
 	int duration;
     int priority;   // smaller value has lower priority
+
 	DetailForm detailForm;
 	
-	Client self = new Client();
-	    public Client(int fanSpeed, int targetTemp, float currentTemp) {
+	Client(int fanSpeed, int targetTemp, float currentTemp) {
         this.fanSpeed = fanSpeed;
         this.targetTemp = targetTemp;
         this.currentTemp = currentTemp;
@@ -49,7 +49,7 @@ public class Client {
 					currentTemp -= 0.5;
 				}
 			}
-			self.Record(roomId,requestTime);//保存记录
+			this.Record(roomId,requestTime);//保存记录
 			
 			//回温程序
 			if(mode!=0)
@@ -96,15 +96,10 @@ public class Client {
         }
 	}
 	
-	public Client GetRoomState() {
+/*	public Client GetRoomState() {
 		Client RoomState = new Client();
 		return RoomState;
-	}
-	
-	public void Record(int roomId, String requestTime) {
-		self.detailForm.InsertRecord(roomId, requestTime, this.duration, this.fanSpeed, 
-				this.feeRate, this.fee);
-	}
+	}*/
 
 	/**
      * Get information of the room associated with client.
@@ -114,4 +109,10 @@ public class Client {
     public RoomState GetRoomState() {
         return null;
     }
+
+	public void Record(int roomId, String requestTime) {
+		this.detailForm.InsertRecord(roomId, requestTime, this.duration, this.fanSpeed,
+				this.feeRate, this.fee);
+	}
+
 }
