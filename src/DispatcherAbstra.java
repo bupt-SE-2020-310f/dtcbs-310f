@@ -16,7 +16,7 @@ public interface DispatcherAbstra {
     public boolean PowerOn();
     public boolean PrintRDR(int roomId, Time dateIn,Time dateOut);
     public boolean PrintReport(int roomId, String dateIn, String dateOut);
-    public Invoice QueryInvoice(int roomId,String StringIn,String StringOut);
+    //public Invoice QueryInvoice(int roomId,String StringIn,String StringOut);
     public List<RDR> QueryRDR(int roomId,String StringIn,String StringOut);
     public List<Report> QueryReport(int roomId, String dateIn, String dateOut);
     float RequestFee (int roomId);

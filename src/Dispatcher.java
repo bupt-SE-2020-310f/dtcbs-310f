@@ -49,8 +49,10 @@ import javax.swing.filechooser.FileSystemView;
  */
 public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
     int defaultTargetTemp;
+    HashMap<Long, Integer> roomId2id = new HashMap<>();
     Queue sQueue, wQueue;
     Server core;
+
     Dispatcher(){
         super();
         core = new Server(0, 25, 18,
@@ -244,10 +246,10 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
     @Override
     public void ChangeTargetTemp(int roomId, int targetTemp) {
         if(sQueue.IsIn(String.valueOf(roomId))) {
-            sQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
+            //sQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
         }
         else {
-            wQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
+            //wQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
         }
         /*
         Improve needed
@@ -308,9 +310,9 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
         return false;
     }
 
-    public Invoice QueryInvoice(int roomId, String StringIn, String StringOut) {
+/*    public Invoice QueryInvoice(int roomId, String StringIn, String StringOut) {
         return null;
-    }
+    }*/
 
     public boolean PrintRDR(int roomId, String dateIn, String dateOut) {
     	List<RDR> listReport = new ArrayList<RDR>();
@@ -489,7 +491,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                         JSONObject jsonData = new JSONObject();
                         for (int i = 0; i < args.length; i++) {
                             //id & currentTemperature & changeTemperature
-                            values[i] = Float.parseFloat(args[1].split("=")[1]);
+                            values[i] = Float.parseFloat(args[i].split("=")[1]);
                         }
                         /*
                         do something here
@@ -504,11 +506,12 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                         response.setEntity(sendBack(jsonFee));
                         System.out.println("Fee request " + " Room 5");
                     }
-                } else if (method.equals("PUT")) {
+                }
+                else if (method.equals("PUT")) {
                     if (type.equals("service")) {
                         float[] values = new float[1];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[1].split("=")[1]);
+                            values[i] = Float.parseFloat(args[i].split("=")[1]);
                         }
                         /*
                         do sth.
@@ -522,7 +525,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                     } else if (type.equals("exit")) {
                         float[] values = new float[1];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[1].split("=")[1]);
+                            values[i] = Float.parseFloat(args[i].split("=")[1]);
                         }
                         /*
 
@@ -534,11 +537,12 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                         response.setEntity(sendBack(jsonExit));
                         System.out.println("Check out" + " Room 5");
                     }
-                } else {  //POST Request
+                }
+                else {  //POST Request
                     if (type.equals("initial")) {//Check in
                         float[] values = new float[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[1].split("=")[1]);
+                            values[i] = Float.parseFloat(args[i].split("=")[1]);
                         }
                         /*
 
@@ -559,7 +563,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                     } else if (type.equals("service")) {
                         float[] values = new float[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[1].split("=")[1]);
+                            values[i] = Float.parseFloat(args[i].split("=")[1]);
                         }
                         /*
 
@@ -573,7 +577,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                     } else if (type.equals("temp")) {
                         float[] values = new float[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[1].split("=")[1]);
+                            values[i] = Float.parseFloat(args[i].split("=")[1]);
                         }
                         /*
 
@@ -587,7 +591,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                     } else if (type.equals("fan")) {
                         float[] values = new float[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[1].split("=")[1]);
+                            values[i] = Float.parseFloat(args[i].split("=")[1]);
                         }
                         /*
 
@@ -607,7 +611,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
     public static void main(String[] args) throws Exception {
 
         int port = 8080;
-        Dispatcher server = new Dispatcher();
+        Dispatcher dispa = new Dispatcher();
 
         if (args.length >= 1) {
             port = Integer.parseInt(args[0]);
@@ -623,7 +627,7 @@ public class Dispatcher extends HttpServerSys implements DispatcherAbstra {
                 .setServerInfo("Server/0.1")
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new HttpServerSys.StdErrorExceptionLogger())
-                .registerHandler("*", new Dispatcher.HttpHandler())
+                .registerHandler("*", new Dispatcher.HttpHandler(dispa))
                 .create();
 
         httpServer.start();
