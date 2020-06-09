@@ -1,9 +1,6 @@
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import struct.RoomState;
+
+import java.text.SimpleDateFormat;
 
 public class Client {
 	boolean on;
@@ -13,86 +10,76 @@ public class Client {
 	float fee;
 	float feeRate;
 	int duration;
+    int priority;   // smaller value has lower priority
+
 	DetailForm detailForm;
 	
-	Client self = new Client();
-	public boolean Enable(int roomId, int mode, int speed, int tgTemp, String requestTime, int requestDuration) {
-		this.on = true;
-		this.fanSpeed = speed;
-		this.duration = requestDuration;
-		//变温程序
-		try {
-			if(mode == 1) {//制热模式
-				this.currentTemp = 16;
-				this.targetTemp = tgTemp;
-				while(currentTemp != targetTemp){
-						Thread.sleep(60000);
-					 //模拟升温每60s升0.5度
-					currentTemp += 0.5;
-				}
+	Client(int fanSpeed, int targetTemp, float currentTemp) {
+        this.fanSpeed = fanSpeed;
+        this.targetTemp = targetTemp;
+        this.currentTemp = currentTemp;
+        this.priority = 1;  // default = 1
+        this.fee = 0;
+    }
+	
+	public boolean Enable(String roomId, int mode, int speed) {
+		SimpleDateFormat startTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");  
+		float changeTemp;
+		float needMinute;
+		float electricQuantity;
+		if(mode == 1) {//制热
+			changeTemp = this.targetTemp - this.currentTemp;
+			needMinute = (float) (changeTemp / 0.5);
+			if(speed == 3) {//高
+				electricQuantity = needMinute / 1;
+				feeRate = electricQuantity * 1;
 			}
-			else if(mode == 0) {//制冷模式
-				this.currentTemp = 32;
-				this.targetTemp = tgTemp;
-				while(currentTemp != targetTemp){
-					Thread.sleep(60000);//模拟降温每60s降0.5度
-					currentTemp -= 0.5;
-				}
+			if(speed == 2) {//中
+				electricQuantity = needMinute / 2;
+				feeRate = electricQuantity * 1;
 			}
-			self.Record(roomId,requestTime);//保存记录
-			
-			//回温程序
-			if(mode!=0)
-				while(Math.abs(currentTemp-targetTemp) != 3){//温差为3度时发送请求
-					Thread.sleep(60000);//模拟回温每60s降0.5度
-					currentTemp -= 0.5;
-				}
-			else
-				while(Math.abs(currentTemp-targetTemp) != 3){
-					Thread.sleep(60000);//模拟回温每60s升0.5度
-					currentTemp += 0.5;
-				}
-		
-			//重新发送修改温度风速请求
-			if(Math.abs(currentTemp-targetTemp) == 3){
-				String u = "address";//server地址
-		        try {
-		            URL url = new URL(u + "/request");
-		            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		
-		            connection.setRequestMethod("POST"); // 设置请求方式
-		            connection.setRequestProperty("Keep-Alive", "application/x-www-form-urlencoded; charset=UTF-8");
-		
-		            PrintWriter pw = new PrintWriter(new BufferedOutputStream(connection.getOutputStream()));
-		            pw.write("name=请进行调温!");
-		            pw.flush();
-		            pw.close();
-		
-		            BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
-		            String line = null;
-		            StringBuilder result = new StringBuilder();
-		            while ((line = br.readLine()) != null) { // 读取数据
-		                result.append(line + "\n");
-		            }
-		            connection.disconnect();
-		        } catch (Exception e) {
-		            e.printStackTrace();
-		        }
+			if(speed == 1) {//低
+				electricQuantity = needMinute / 3;
+				feeRate = electricQuantity * 1;
 			}
+		}
+		else if(mode == 0) {//制冷
+			changeTemp = this.currentTemp - this.targetTemp;
+			needMinute = (float) (changeTemp / 0.5);
+			if(speed == 3) {//高
+				electricQuantity = needMinute / 1;
+				feeRate = electricQuantity * 1;
+			}
+			if(speed == 2) {//中
+				electricQuantity = needMinute / 2;
+				feeRate = electricQuantity * 1;
+			}
+			if(speed == 1) {//低
+				electricQuantity = needMinute / 3;
+				feeRate = electricQuantity * 1;
+			}
+		}
+		this.fee += this.feeRate;
+		this.Record(roomId,startTime,speed,feeRate);
 		return true;
-		}catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
 	}
 	
-	public Client GetRoomState() {
+/*	public Client GetRoomState() {
 		Client RoomState = new Client();
 		return RoomState;
+	}*/
+
+	/**
+     * Get information of the room associated with client.
+     *
+     * @return the information
+     */
+    public RoomState GetRoomState() {
+        return null;
+    }
+
+	public void Record(String roomId, SimpleDateFormat startTime, int fanSpeed, float feeRate) {
+		this.detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);
 	}
-	
-	public void Record(int roomId, String requestTime) {
-		self.detailForm.InsertRecord(roomId, requestTime, this.duration, this.fanSpeed, 
-				this.feeRate, this.fee);
-	}
+
 }
