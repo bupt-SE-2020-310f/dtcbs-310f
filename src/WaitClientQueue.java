@@ -7,13 +7,12 @@
  */
 public class WaitClientQueue extends Queue {
 
-    public WaitClientQueue(Dispatcher dispatcher, Queue tother) {
-        super(dispatcher, tother);
-    }
-
     /**
-     * Get an identifier of room,
-     * this room has the highest priority and higher than level.
+     * Get the roomId of target room,
+     * this room is binded with a client having the highest priority and higher than level.
+     * When some clients have equal priority, select the first one,
+     * because it has the shortest wait-time
+     * Priority can be represented by fanSpeed here.
      *
      * @param level the limit priority
      * @return room identifier normally, null if no such room exits.
@@ -22,9 +21,9 @@ public class WaitClientQueue extends Queue {
         int high = level;
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
-            Client client = this.roomInfo.get(roomId);
-            if (client.priority > high) {
-                high = client.priority;
+            Client client = this.Get(roomId);
+            if (client.fanSpeed > high) {
+                high = client.fanSpeed;
                 id = roomId;
             }
         }

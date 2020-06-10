@@ -5,28 +5,47 @@
  * @since 8 June 2020
  */
 public class Timer {
+    String roomId;
+    Thread timer;
+
     /**
-     * Set timer for client at roomId.
-     * Invoke queue.TimeOut when timer ran out.
+     * Initialize the timer for client at roomId.
      *
      * @param roomId identifier of room
      * @param time time slice length
      * @param queue timer attched to the queue, and used for callback
      */
-    public void TimeSet(String roomId, int time, Queue queue) {
-        if (queue instanceof WaitClientQueue) {
-            return;
-        }
-        new Thread(new Runnable() {
+    public Timer(String roomId, int time, Queue queue) {
+        this.roomId = roomId;
+        timer = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(time);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    queue.TimeOut(roomId);
+                } catch (InterruptedException ignored) {
+
                 }
-                queue.TimeOut(roomId);
             }
-        }).start();
+        });
+    }
+
+    /**
+     * Start timer
+     */
+    public void TimeSet() {
+        this.timer.start();
+    }
+
+    /**
+     * Cancel timer
+     */
+    public void TimeCancel() {
+        this.timer.interrupt();
+        try {
+            this.timer.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
