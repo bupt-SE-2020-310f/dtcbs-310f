@@ -7,15 +7,23 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * This class works as a service provider for rooms,
+ * these rooms are in service or waitting for service.
+ *
+ * @author zyl
+ * @since 9 June 2020
+ */
 public class Client {
 	boolean on;
-	float currentTemp;
-	int targetTemp;
-	int fanSpeed;
 	float fee;
 	float feeRate;
 	int duration;
     int priority;   // smaller value has lower priority
+    int fanSpeed; // also as priority: 0,1,2, smaller value has lower fanSpeed/priority
+    int targetTemp;
+    float currentTemp;
+
 
 	DetailForm detailForm;
 	
@@ -23,7 +31,6 @@ public class Client {
         this.fanSpeed = fanSpeed;
         this.targetTemp = targetTemp;
         this.currentTemp = currentTemp;
-        this.priority = 1;  // default = 1
     }
 	
 	public boolean Enable(int roomId, int mode, int speed, int tgTemp, String requestTime, int requestDuration) {
@@ -101,8 +108,9 @@ public class Client {
 		return RoomState;
 	}*/
 
-	/**
-     * Get information of the room associated with client.
+    /**
+     * Get information of the room binded with this client.
+
      *
      * @return the information
      */
