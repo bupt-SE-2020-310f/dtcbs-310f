@@ -90,7 +90,7 @@ public class Client {
 				electricQuantity = needMinute / 2;
 				feeRate = electricQuantity * 1;
 			}
-			this.Record(roomId, requestTime);//保存记录
+			//this.Record(roomId, requestTime);//保存记录
 
 			//回温程序
 			if (mode != 0)
@@ -138,6 +138,7 @@ public class Client {
 			this.Record(roomId, startTime, speed, feeRate);
 			return true;
 		}
+		return false;
 	}
 	
 /*	public Client GetRoomState() {
@@ -162,7 +163,7 @@ public class Client {
 	}
 
 	public void Record(String roomId, SimpleDateFormat startTime, int fanSpeed, float feeRate) {
-		this.detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);
+		//this.detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);
 	}
 
 }

@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.DatagramSocketImplFactory;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -63,403 +64,13 @@ public class Dispatcher extends HttpServerSys {
         wQueue.tother = sQueue;
     }
 
-    public boolean PrintReport(int roomId, String dateIn, String dateOut) {
-    	List<Report> listReport = new ArrayList<Report>();
-    	
-    	Connection connection = null;
-    	PreparedStatement preparedStatement = null;
-    	ResultSet resultSet = null;
-
-        try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
-
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "SELECT * FROM Report where id=roomId";
-            preparedStatement = connection.prepareStatement(sql);
-
-            resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-            	int ReportId = resultSet.getInt(1);
-            	String RoomId = resultSet.getString(2);
-            	float TotalFee = resultSet.getFloat(3);
-            	int NumberofRDR = resultSet.getInt(4);
-            	int TimesofOnOff = resultSet.getInt(5);
-            	int TimesofDispatch = resultSet.getInt(6);
-            	int TimesofChangeTemp = resultSet.getInt(7);
-            	int TimesofChangeFanSpeed = resultSet.getInt(8);
-            	int Duration = resultSet.getInt(9);
-                Report report= new Report(ReportId,RoomId,TotalFee,NumberofRDR,TimesofOnOff,TimesofDispatch,TimesofChangeTemp,TimesofChangeFanSpeed,Duration);
-                listReport.add(report);
-            }
-            
-            FileSystemView fsv = FileSystemView.getFileSystemView();
-            File com = fsv.getHomeDirectory();
-            String deskPath = com.getPath();
-            File file = new File( deskPath + "\\" + "310fReport.txt" );
-            BufferedWriter bw = null;
-            try {
-            	bw = new BufferedWriter( new FileWriter(file) );
-            	for(int i = 0; i < listReport.size(); i++ ) {
-            		bw.write( listReport.get(i).toString() );
-            		bw.newLine();
-            		}
-            	bw.close();
-            	} catch (IOException e) {
-            		e.printStackTrace();
-            	}
-            
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally{
-            try {
-                if(resultSet != null){
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(preparedStatement != null){
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(connection != null){
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        
-		return false;
-    }
-    
-    public List<Report> QueryReport(int roomId, String dateIn, String dateOut){
-    	List<Report> listReport = new ArrayList<Report>();
-    	
-    	Connection connection = null;
-    	PreparedStatement preparedStatement = null;
-    	ResultSet resultSet = null;
-
-        try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
-
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "SELECT * FROM Report where id=roomId";
-            preparedStatement = connection.prepareStatement(sql);
-            resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-            	int ReportId = resultSet.getInt(1);
-            	String RoomId = resultSet.getString(2);
-            	float TotalFee = resultSet.getFloat(3);
-            	int NumberofRDR = resultSet.getInt(4);
-            	int TimesofOnOff = resultSet.getInt(5);
-            	int TimesofDispatch = resultSet.getInt(6);
-            	int TimesofChangeTemp = resultSet.getInt(7);
-            	int TimesofChangeFanSpeed = resultSet.getInt(8);
-            	int Duration = resultSet.getInt(9);
-                Report report= new Report(ReportId,RoomId,TotalFee,NumberofRDR,TimesofOnOff,TimesofDispatch,TimesofChangeTemp,TimesofChangeFanSpeed,Duration);
-                listReport.add(report);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally{
-            try {
-                if(resultSet != null){
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(preparedStatement != null){
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(connection != null){
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return listReport;
-    }
-
-    
-    public float RequestFee(int roomId) {
-        return sQueue.Get(String.valueOf(roomId)).fee;
-    }
-
-    public boolean RequestOff(int roomId) {
-        return  !(sQueue.Pop(String.valueOf(roomId)) == null) ||
-                !(wQueue.Pop(String.valueOf(roomId)) == null);
-    }
-
-    
-    public boolean RequestOn(int roomId, float currentRoomTemp) {
-        return false;
-    }
-
-    
-    public void SetPara(int mode, int tempHighLimit, int tempLowLimit,
-                        int defaultTargetTemp, int feeRateH,
-                        int feeRateM, int feeRateL) {
-        core.SetPara(mode, tempHighLimit, tempLowLimit,
-                    defaultTargetTemp, feeRateH,
-                    feeRateM, feeRateL);
-    }
-
-    
-    public boolean StartUp() {
-        return false;
-    }
-
-    
-    public void ChangeFanSpeed(int roomId, int fanSpeed) {
-        if(sQueue.IsIn(String.valueOf(roomId))){
-            sQueue.ChangeSpeed(String.valueOf(roomId), fanSpeed);
-        }
-    }
-
-    
-    public void ChangeTargetTemp(int roomId, int targetTemp) {
-        if(sQueue.IsIn(String.valueOf(roomId))) {
-            //sQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
-        }
-        else {
-            //wQueue.ChangeTemp(String.valueOf(roomId), targetTemp);
-        }
-        /*
-        Improve needed
-         */
-    }
-
-    
-    public List<RoomState> CheckRoomState(List<Integer> listRoomId) {
-        return null;
-    }
-
-    public boolean DeleteReport(int ReportId, String date) {
-            Connection connection = null;
-            PreparedStatement preparedStatement = null;
-            try {
-                String driverClass = "com.mysql.jdbc.Driver";
-                String url = "jdbc:mysql:///mydb";
-                String user = "root";
-                String pass= "1234";
-
-                Class.forName(driverClass);
-                connection = DriverManager.getConnection(url, user, pass);
-
-                String sql = "DELETE FROM Report WHERE id=?";
-                preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setInt(1,ReportId);
-                
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally{
-                try {
-                    if(preparedStatement != null){
-                        preparedStatement.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    if(connection != null){
-                        connection.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-			return false;
-    }
-
-    
-    public boolean PowerOn() {
-        return false;
-    }
-
-    
-    public boolean PrintRDR(int roomId, Time dateIn, Time dateOut) {
-        return false;
-    }
-
-/*    public Invoice QueryInvoice(int roomId, String StringIn, String StringOut) {
-        return null;
-    }*/
-
-    public boolean PrintRDR(int roomId, String dateIn, String dateOut) {
-    	List<RDR> listReport = new ArrayList<RDR>();
-    	
-    	Connection connection = null;
-    	PreparedStatement preparedStatement = null;
-    	ResultSet resultSet = null;
-
-        try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
-
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "SELECT * FROM Report where id=roomId";
-            preparedStatement = connection.prepareStatement(sql);
-
-            resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-            	String RoomId = resultSet.getString(1);
-            	int  RequestTime = resultSet.getInt(2);
-            	int RequestDuration = resultSet.getInt(3);
-            	int FanSpeed = resultSet.getInt(4);
-            	int FeeRate = resultSet.getInt(5);
-            	int Fee = resultSet.getInt(6);
-            	RDR listRDR= new RDR(RoomId,RequestTime,RequestDuration,FanSpeed,FeeRate,Fee);
-                listReport.add(listRDR);
-            }
-            
-            FileSystemView fsv = FileSystemView.getFileSystemView();
-            File com = fsv.getHomeDirectory();
-            String deskPath = com.getPath();
-            File file = new File( deskPath + "\\" + "310fRDR.txt" );
-            BufferedWriter bw = null;
-            try {
-            	bw = new BufferedWriter( new FileWriter(file) );
-            	for(int i = 0; i < listReport.size(); i++ ) {
-            		bw.write( listReport.get(i).toString() );
-            		bw.newLine();
-            		}
-            	bw.close();
-            	} catch (IOException e) {
-            		e.printStackTrace();
-            	}
-            
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally{
-            try {
-                if(resultSet != null){
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(preparedStatement != null){
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(connection != null){
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        
-		return false;
-    }
-    
-    public List<RDR> QueryRDR(int roomId, String dateIn, String dateOut){
-    	try {
-    		List<RDR> listRDR = new ArrayList<RDR>();
-    		DetailForm df = new DetailForm();
-    		listRDR = df.QueryRDR(roomId, dateIn, dateOut);
-    		return listRDR;
-    	} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-    }
-
-    public boolean PrintInvoice(int roomId, String dateOut) {
-    	try {
-    		Map<String, Object> Invoice = new HashMap<String, Object>();
-    		DetailForm df = new DetailForm();
-    		Invoice = df.MakeInvoice(roomId, dateOut);
-        	String line = System.getProperty("line.separator");
-        	StringBuffer str = new StringBuffer();
-        	FileWriter fw = new FileWriter("C:\\310fInvoice.txt", true);
-        	Set<Entry<String, Object>> set = Invoice.entrySet();
-        	Iterator<Entry<String, Object>> iter = set.iterator();
-        	while(iter.hasNext()){
-        		@SuppressWarnings("rawtypes")
-				Map.Entry entry = (Map.Entry)iter.next();
-        		str.append(entry.getKey()+" : "+entry.getValue()).append(line);
-        	}
-        	fw.write(str.toString());
-        	fw.close();
-    		return true;
-    	} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-    }
-    
-    public Map<String, Object> QueryInvoice(int roomId, String dateOut) {
-    	try {
-    		Map<String, Object> Invoice = new HashMap<String, Object>();
-    		DetailForm df = new DetailForm();
-    		Invoice = df.MakeInvoice(roomId, dateOut);
-        	String line = System.getProperty("line.separator");
-        	StringBuffer str = new StringBuffer();
-        	FileWriter fw = new FileWriter("C:\\310fInvoice.txt", true);
-        	Set<Entry<String, Object>> set = Invoice.entrySet();
-        	Iterator<Entry<String, Object>> iter = set.iterator();
-        	while(iter.hasNext()){
-        		@SuppressWarnings("rawtypes")
-				Map.Entry entry = (Map.Entry)iter.next();
-        		str.append(entry.getKey()+" : "+entry.getValue()).append(line);
-        	}
-        	fw.write(str.toString());
-        	fw.close();
-    		return Invoice;
-    	} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-
-    }
 
     static class HttpHandler implements HttpRequestHandler {
-        Dispatcher controller = null;
+        Dispatcher ctrl = null;
+
         public HttpHandler(Dispatcher dispatcher) {
             super();
-            controller = dispatcher;
+            ctrl = dispatcher;
         }
 
         public StringEntity sendBack(JSONObject js) {
@@ -488,21 +99,34 @@ public class Dispatcher extends HttpServerSys {
 
                 if (method.equals("GET")) {
                     if (type.equals("fee")) {
-                        float[] values = new float[3];
+                        String[] values = new String[3];
                         JSONObject jsonFee = new JSONObject();
                         JSONObject jsonData = new JSONObject();
                         for (int i = 0; i < args.length; i++) {
                             //id & currentTemperature & changeTemperature
-                            values[i] = Float.parseFloat(args[i].split("=")[1]);
+                            values[i] = (args[i].split("=")[1]);
                         }
-                        /*
-                        do something here
-                         */
+                        String id = values[0];
+                        float currT = Float.parseFloat(values[1]);
+                        float changeT = Float.parseFloat(values[2]);
+                        float fee = 0;
+                        int rs = 2;
+                        if (sQ().IsIn(id)){
+                            Client c = sQ().Get(id);
+                            //c.Update(currT, changeT);
+                            fee = sQ().Get(id).fee;
+                            rs = 0;
+                        } else if (wQ().IsIn(id)){
+                            Client c = sQ().Get(id);
+                            //c.Update(currT, changeT);
+                            fee = wQ().Get(id).fee;
+                            rs = 1;
+                        }
                         jsonFee.put("status", 0);
                         jsonFee.put("msg", "成功");
-                        jsonData.put("fee", 4.05);
-                        jsonData.put("roomState", 0);
-                        jsonData.put("id", 5);
+                        jsonData.put("fee", fee);
+                        jsonData.put("roomState", rs);
+                        jsonData.put("id", id);
                         jsonFee.put("data", jsonData);
                         response.setStatusCode(HttpStatus.SC_OK);
                         response.setEntity(sendBack(jsonFee));
@@ -511,13 +135,24 @@ public class Dispatcher extends HttpServerSys {
                 }
                 else if (method.equals("PUT")) {
                     if (type.equals("service")) {
-                        float[] values = new float[1];
+                        String[] values = new String[1];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[i].split("=")[1]);
+                            values[i] = (args[i].split("=")[1]);
                         }
-                        /*
-                        do sth.
-                         */
+                        String id = values[0];
+                        if (sQ().IsIn(id)){
+                            Client c = sQ().Pop(id);
+                            c.ShutDown();
+                            if ((id = wQ().HasHighestPriority()) != null){
+                                String idS = sQ().HasLowestPriority();
+                                if (wQ().Get(id).priority > sQ().Get(idS).priority){
+                                    wQ().Exchange(idS, id);
+                                }
+                            }
+                        } else if (wQ().IsIn(id)){
+                            Client c = sQ().Pop(id);
+                            c.ShutDown();
+                        }
                         JSONObject jsonShutdown = new JSONObject();
                         jsonShutdown.put("status", 0);
                         jsonShutdown.put("msg", "成功");
@@ -525,61 +160,87 @@ public class Dispatcher extends HttpServerSys {
                         response.setEntity(sendBack(jsonShutdown));
                         System.out.println("Shutdown " + " Room 5");
                     } else if (type.equals("exit")) {
-                        float[] values = new float[1];
+                        String[] values = new String[1];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[i].split("=")[1]);
+                            values[i] = (args[i].split("=")[1]);
                         }
-                        /*
+                        String id = values[0];
+                        String rmId = "";
 
-                         */
+                        if (sQ().IsIn(id)){
+                            Client c = sQ().Pop(id);
+                            c.ShutDown();
+                            if ((id = wQ().HasHighestPriority()) != null){
+                                String idS = sQ().HasLowestPriority();
+                                if (wQ().Get(id).priority > sQ().Get(idS).priority){
+                                    wQ().Exchange(idS, id);
+                                }
+                            }
+                        } else if (wQ().IsIn(id)){
+                            Client c = sQ().Pop(id);
+                            c.ShutDown();
+                        }
+                        Iterator iter = this.ctrl.roomId2id.entrySet().iterator();
+                        while (iter.hasNext()){
+                            Map.Entry entry = (Map.Entry) iter.next();
+                            String val = (String) entry.getValue();
+                            if (val.equals(id)){
+                                rmId = (String) entry.getKey();
+                                iter.remove();
+                            }
+                        }
                         JSONObject jsonExit = new JSONObject();
                         jsonExit.put("status", 0);
                         jsonExit.put("msg", "成功");
                         response.setStatusCode(HttpStatus.SC_OK);
                         response.setEntity(sendBack(jsonExit));
-                        System.out.println("Check out" + " Room 5");
+                        System.out.println("Check out " + rmId);
                     }
                 }
                 else {  //POST Request
                     if (type.equals("initial")) {//Check in
-                        float[] values = new float[3];
+                        String[] values = new String[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[i].split("=")[1]);
+                            values[i] = (args[i].split("=")[1]);
                         }
-                        /*
+                        Long rmId = Long.parseLong(values[0]);
+                        float currT = Float.parseFloat(values[1]);
+                        Client c = new Client(1, (int)currT, currT);
+                        int id = (int) System.currentTimeMillis();
 
-                         */
+                        this.ctrl.roomId2id.put(rmId, id);
                         JSONObject jsonCheckIn = new JSONObject();
                         JSONObject jsonData = new JSONObject();
                         jsonCheckIn.put("status", 0);
                         jsonCheckIn.put("msg", "成功");
-                        jsonData.put("id", 10);
-                        jsonData.put("highestTemperature", 24);
-                        jsonData.put("lowestTemperature", 16);
+                        jsonData.put("id", id);
+                        jsonData.put("highestTemperature", this.ctrl.core.tempHighLimit);
+                        jsonData.put("lowestTemperature", this.ctrl.core.tempLowLimit);
                         jsonData.put("defaultFanSpeed", 1);
-                        jsonData.put("defaultTargetTemperature", 26);
+                        jsonData.put("defaultTargetTemperature", this.ctrl.core.defaultTargetTemp);
                         jsonCheckIn.put("data", jsonData);
                         response.setStatusCode(HttpStatus.SC_OK);
                         response.setEntity(sendBack(jsonCheckIn));
-                        System.out.println("Check in" + " Room 5");
+                        System.out.println("Check in" + " Room " + values[0] + " id: " + String.valueOf(id));
                     } else if (type.equals("service")) {
-                        float[] values = new float[3];
+                        String[] values = new String[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[i].split("=")[1]);
+                            values[i] = (args[i].split("=")[1]);
                         }
-                        /*
-
-                         */
+                        String id = values[0];
+                        int targetT = Integer.parseInt(values[1]);
+                        int targetSpd = Integer.parseInt(values[2]);
+                        Client c = new Client(targetSpd, targetT, )
                         JSONObject jsonExit = new JSONObject();
                         jsonExit.put("status", 0);
                         jsonExit.put("msg", "成功");
                         response.setStatusCode(HttpStatus.SC_OK);
                         response.setEntity(sendBack(jsonExit));
-                        System.out.println("Shutdown " + " Room 5");
+                        System.out.println("Boot" + " Room 5");
                     } else if (type.equals("temp")) {
-                        float[] values = new float[3];
+                        String[] values = new String[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[i].split("=")[1]);
+                            values[i] = (args[i].split("=")[1]);
                         }
                         /*
 
@@ -589,11 +250,11 @@ public class Dispatcher extends HttpServerSys {
                         jsonTemp.put("msg", "成功");
                         response.setStatusCode(HttpStatus.SC_OK);
                         response.setEntity(sendBack(jsonTemp));
-                        System.out.println("Adjust speed " + "room " + Float.toString(values[0]));
+                        System.out.println("Adjust speed " + "room " + (values[0]));
                     } else if (type.equals("fan")) {
-                        float[] values = new float[3];
+                        String[] values = new String[3];
                         for (int i = 0; i < args.length; i++) {
-                            values[i] = Float.parseFloat(args[i].split("=")[1]);
+                            values[i] = (args[i].split("=")[1]);
                         }
                         /*
 
@@ -603,16 +264,23 @@ public class Dispatcher extends HttpServerSys {
                         jsonFan.put("msg", "成功");
                         response.setStatusCode(HttpStatus.SC_OK);
                         response.setEntity(sendBack(jsonFan));
-                        System.out.println("Adjust speed " + "room " + Float.toString(values[0]));
+                        System.out.println("Adjust speed " + "room " + (values[0]));
                     }
                 }
             }
+        }
+        private Queue sQ(){
+            return sQ();
+        }
+        
+        private Queue wQ(){
+            return wQ();
         }
     }
 
     public static void main(String[] args) throws Exception {
 
-        int port = 8088;
+        int port = 8080;
         Dispatcher dispa = new Dispatcher();
 
         if (args.length >= 1) {
@@ -626,7 +294,7 @@ public class Dispatcher extends HttpServerSys {
 
         final HttpServer httpServer = ServerBootstrap.bootstrap()
                 .setListenerPort(port)
-                .setServerInfo("Server/0.1")
+                .setServerInfo("Server/301f")
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new HttpServerSys.StdErrorExceptionLogger())
                 .registerHandler("*", new Dispatcher.HttpHandler(dispa))
@@ -636,7 +304,7 @@ public class Dispatcher extends HttpServerSys {
         httpServer.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
-            
+
             public void run() {
                 httpServer.shutdown(5, TimeUnit.SECONDS);
             }
