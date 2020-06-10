@@ -57,8 +57,10 @@ public class Dispatcher extends HttpServerSys {
         super();
         core = new Server(0, 25, 18,
                 22, 1, (float) 0.5, (float) 1/3);
-        sQueue = new ServeClientQueue(this, wQueue);
-        wQueue = new WaitClientQueue(this, sQueue);
+        sQueue = new ServeClientQueue();
+        wQueue = new WaitClientQueue();
+        sQueue.tother = wQueue;
+        wQueue.tother = sQueue;
     }
 
     public boolean PrintReport(int roomId, String dateIn, String dateOut) {
