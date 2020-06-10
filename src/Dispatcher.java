@@ -478,6 +478,7 @@ public class Dispatcher extends HttpServerSys {
             String target = request.getRequestLine().getUri();
             System.out.print(target + "\n");
             String[] paths = target.split("/");
+            response.setHeader("Access-Control-Allow-Origin","*");
             if (paths[1].equals("room") && paths[2] != null) {
                 String[] typeAndArgs = paths[2].split("\\?");
                 String type = typeAndArgs[0];
@@ -609,7 +610,7 @@ public class Dispatcher extends HttpServerSys {
 
     public static void main(String[] args) throws Exception {
 
-        int port = 8080;
+        int port = 8088;
         Dispatcher dispa = new Dispatcher();
 
         if (args.length >= 1) {
