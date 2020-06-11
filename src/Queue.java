@@ -16,7 +16,7 @@ public class Queue {
     int queueLength;
     Map<String, Client> roomInfo;
     Queue tother;
-    int waitTime;
+    int waitTime = 2*60*1000;
 
     public Queue() {
         this.roomInfo = new LinkedHashMap<>();
@@ -192,14 +192,22 @@ public class Queue {
     /**
      * When a client has waitted for a time slice in waitQ, this method will be invoked by Timer class.
      * This client will be exchanged with a target client in serveQ,
-     * target client has the lowest priority, if priorities are equal, select the first one.
+     * target client has the lower or the same priority, if priorities are equal, select the first one.
+     * If no such target client, then do nothing.
      *
      * @param roomId identifier of room in timeout
      */
-    public void TimeOut(String roomId) {
+    public synchronized void TimeOut(String roomId) {
         if (this instanceof WaitClientQueue && this.IsIn(roomId)) {
-            // exchange this client in waitQ with client having lowest priority in serveQ
-            String roomId2 = this.tother.HasLowestPriority();
+            // exchange this client in waitQ with client having lower or the same priority in serveQ
+            int level = -1;
+            if (this.Get(roomId) != null) {
+                level = this.Get(roomId).fanSpeed;
+            }
+            String roomId2 = ((ServeClientQueue)this.tother).HasLowerPriority(level+1);
+            if (roomId2 == null) {
+                return;
+            }
             this.Exchange(roomId, roomId2);
         }
     }

@@ -5,8 +5,7 @@
  * @since 8 June 2020
  */
 public class Timer {
-    String roomId;
-    Thread timer;
+    Thread timeThread;
 
     /**
      * Initialize the timer for client at roomId.
@@ -16,8 +15,7 @@ public class Timer {
      * @param queue timer attched to the queue, and used for callback
      */
     public Timer(String roomId, int time, Queue queue) {
-        this.roomId = roomId;
-        timer = new Thread(new Runnable() {
+        timeThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -27,25 +25,25 @@ public class Timer {
 
                 }
             }
-        });
+        }, "timer " + roomId);
     }
 
     /**
      * Start timer
      */
     public void TimeSet() {
-        this.timer.start();
+        this.timeThread.start();
     }
 
     /**
      * Cancel timer
      */
     public void TimeCancel() {
-        this.timer.interrupt();
+        this.timeThread.interrupt();
         try {
-            this.timer.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            this.timeThread.join();
+        } catch (InterruptedException ignored) {
+
         }
     }
 }
