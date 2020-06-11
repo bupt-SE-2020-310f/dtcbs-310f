@@ -1,6 +1,6 @@
+package struct;
 public class Report {
 	//实体类的成员变量和数据库表的字段名称和类型一致
-    private int ReportId;
     private String RoomId;
     private float TotalFee;
     private int NumberofRDR;
@@ -10,14 +10,13 @@ public class Report {
     private int TimesofChangeFanSpeed;
     private int Duration;
     
-    public Report(int ReportId, String RoomId, float TotalFee, int NumberofRDR,
+    public Report(String RoomId, float TotalFee, int NumberofRDR,
     		int TimesofOnOff, int TimesofDispatch, int TimesofChangeTemp,
     		int TimesofChangeFanSpeed, int Duration) {
         super();
-        this.ReportId = ReportId;
         this.RoomId = RoomId;
         this.TotalFee = TotalFee;
-        this.NumberofRDR = ReportId;
+        this.NumberofRDR = NumberofRDR;
         this.TimesofOnOff = TimesofOnOff;
         this.TimesofDispatch = TimesofDispatch;
         this.TimesofChangeTemp = TimesofChangeTemp;
@@ -25,12 +24,6 @@ public class Report {
         this.Duration = Duration;
     }
     //创建每个成员变量的set和get方法
-    public int getReportId() {
-        return ReportId;
-    }
-    public void setReportId(int ReportId) {
-        this.ReportId = ReportId;
-    }
     public String getRoomId() {
         return RoomId;
     }
@@ -79,10 +72,5 @@ public class Report {
     public void setDuration(int Duration) {
         this.Duration = Duration;
     }
-    /*
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", name=" + user_name + ", age=" + age + "]";
-    }*/
 
 }

@@ -1,44 +1,41 @@
+package test;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
+import struct.Invoice;
+import struct.RDR;
 
 public class DetailForm {
-	//连接oracle路径方式 "gfs"是要建立连接的数据库名 1521端口
-	String url="jdbc:oracle:thin:@localhost:1521:gfs";
-	String user="name";//user是数据库的用户名
-	String password="xxxxx";//用户登录密码
+	Database db = new Database();
 	
-	public boolean InsertRecord(int roomId, String requestTime, int requestDuration, int fanSpeed, float feeRate, float fee) {
+	public boolean InsertRecord(String roomId, String startTime, int fanSpeed, float feeRate) {	
 		Connection conn=null;
 		Statement st=null;
-		//建立连接
 		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");//首先建立驱动
-			conn=DriverManager.getConnection(url, user, password);//驱动成功后进行连接
+			Class.forName(db.driverName);
+			conn=DriverManager.getConnection(db.url, db.user, db.password);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		//插入操作
 		try {
-			st=conn.createStatement();//获得连接
-			//创建插入的sql语句
-			String sql="insert into stu values(roomId, requestTime, requestDuration, fanSpeed, feeRate, fee)";
-			//返回一个进行此操作的结果，要么成功，要么失败，如果返回的结果>0就是成功，反之失败
+			st=conn.createStatement();
+			String sql="insert into Record(RoomId,StartTime,FanSpeed,FeeRate) values(roomId, startTime, fanSpeed, feeRate)";
 			int result=st.executeUpdate(sql);
 			if(result > 0) {
-				return true;//插入成功
+				return true;
 			}
 			else {
-				return false;//插入失败
+				return false;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -47,66 +44,89 @@ public class DetailForm {
 		
 	}
 	
-	public Map<String, Object> MakeInvoice(int roomId, String dateOut) {
-		Map<String, Object> Invoice = new HashMap<String, Object>();
-		Connection conn=null;
-		Statement st=null;
-		ResultSet rs=null;
-		//获取连接对象
-		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");//首先建立驱动
-			conn=DriverManager.getConnection(url, user, password);//驱动成功后进行连接
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		//查询操作
-		try {
-			st=conn.createStatement();//创建statement类对象，用来执行SQL语句！
-			//创建sql查询语句
-			String sql="select RoomId,RequestTime,Fee from RDR where %dateOut% like RequestTime and RoomId=roomId";
-			rs=st.executeQuery(sql);//执行sql语句并且换回一个查询的结果集
-			while(rs.next()) {//循环遍历结果集，将结果保存到Map中
-				Invoice.put("RoomId", rs.getString("RoomId"));
-				Invoice.put("TotalFee", rs.getInt("TotalFee"));
-				Invoice.put("DateIn", rs.getString("DateIn"));
-				Invoice.put("Dateout", rs.getFloat("Dateout"));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Invoice;
+	public Invoice MakeInvoice(String roomId, String dateIn, String dateOut){
+		String RoomId;
+    	String DateIn;
+    	String DateOut;
+    	float TotalFee;
+		Connection connection = null;
+	    Statement statement = null;
+	    ResultSet resultSet = null;
+	    try {
+	        Class.forName(db.driverName).newInstance();
+	        Driver driver = DriverManager.getDriver(db.url); 
+	        Properties props = new Properties();
+	        props.put("user", db.user);
+	        props.put("password", db.password);
+	        
+	        connection = driver.connect(db.url, props);
+	        statement = connection.createStatement();
+	        //Execute the SQL statement and return the result
+	        resultSet = statement.executeQuery("select RoomId,StartTime,TerminationTime,sum(FeeRate) as TotalFee "
+	        		+ "from Record where RoomId="+roomId+" and StartTime>"+dateIn+" and TerminationTime<"+dateOut);
+        	RoomId = resultSet.getString(1);
+        	DateIn = resultSet.getString(2);
+        	DateOut = resultSet.getString(3);
+        	TotalFee = resultSet.getFloat(4);
+        	System.out.println("RoomId："+RoomId);
+        	System.out.println("RoomId："+DateIn);
+        	System.out.println("DateOut："+DateOut);
+        	System.out.println("DateOut："+TotalFee);
+        	Invoice Invoice = new Invoice(RoomId,DateIn,DateOut,TotalFee);
+        	return Invoice;
+	    }
+	    catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally{
+            try {
+                if(resultSet != null)
+                    resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                if(connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+	    
 	}
 	
-	public List<RDR> QueryRDR(int roomId, String dateIn, String dateOut){
+	public List<RDR> QueryRDR(String roomId, String dateIn, String dateOut){
 		List<RDR> listRDR=new ArrayList<RDR>();
 		Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	ResultSet resultSet = null;
-
+    	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
+            Class.forName(db.driverName);
+            connection = DriverManager.getConnection(db.url, db.user, db.password);
 
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "SELECT * FROM RDR where id=roomId";
+            String sql = "SELECT * from Record where RoomId="+roomId+" and StartTime>"+dateIn+" and TerminationTime<"+dateOut;
             preparedStatement = connection.prepareStatement(sql);
 
             resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
             	String RoomId = resultSet.getString(1);
-            	int RequestTime = resultSet.getInt(2);
-            	int RequestDuration = resultSet.getInt(3);
+            	String RequestTime = resultSet.getString(2);
+            	String TerminationTime = resultSet.getString(3);
             	int FanSpeed = resultSet.getInt(4);
-            	int FeeRate = resultSet.getInt(5);
-            	int Fee = resultSet.getInt(5);
-                RDR RDR= new RDR(RoomId, RequestTime, RequestDuration, FanSpeed, FeeRate, Fee);
+            	float FeeRate = resultSet.getInt(5);
+            	
+                long NTime =df.parse(RequestTime).getTime();
+                long OTime = df.parse(TerminationTime).getTime();
+                long RequestDuration=(NTime-OTime)/1000;
+            	
+                RDR RDR= new RDR(RoomId, RequestTime, RequestDuration, FanSpeed, FeeRate);
                 listRDR.add(RDR);
+                System.out.println("roomId："+RoomId);
+                System.out.println("RequestTime："+RequestTime);
+                System.out.println("RequestDuration："+RequestDuration);
+                System.out.println("FanSpeed："+FanSpeed);
+                System.out.println("FeeRate："+FeeRate);
             }
         } catch (Exception e) {
             e.printStackTrace();

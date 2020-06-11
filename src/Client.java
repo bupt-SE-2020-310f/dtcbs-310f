@@ -1,6 +1,8 @@
+package test;
 import struct.RoomState;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Client {
 	boolean on;
@@ -23,44 +25,45 @@ public class Client {
     }
 	
 	public boolean Enable(String roomId, int mode, int speed) {
-		SimpleDateFormat startTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");  
+		Date date = new Date();
+		SimpleDateFormat startTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		float changeTemp;
 		float needMinute;
 		float electricQuantity;
-		if(mode == 1) {//heating
+		if(mode == 1) {//制热
 			changeTemp = this.targetTemp - this.currentTemp;
 			needMinute = (float) (changeTemp / 0.5);
-			if(speed == 3) {//H
+			if(speed == 3) {//高
 				electricQuantity = needMinute / 1;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 2) {//M
+			if(speed == 2) {//中
 				electricQuantity = needMinute / 2;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 1) {//L
+			if(speed == 1) {//低
 				electricQuantity = needMinute / 3;
 				feeRate = electricQuantity * 1;
 			}
 		}
-		else if(mode == 0) {//refrigeration
+		else if(mode == 0) {//制冷
 			changeTemp = this.currentTemp - this.targetTemp;
 			needMinute = (float) (changeTemp / 0.5);
-			if(speed == 3) {//H
+			if(speed == 3) {//高
 				electricQuantity = needMinute / 1;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 2) {//M
+			if(speed == 2) {//中
 				electricQuantity = needMinute / 2;
 				feeRate = electricQuantity * 1;
 			}
-			if(speed == 1) {//L
+			if(speed == 1) {//低
 				electricQuantity = needMinute / 3;
 				feeRate = electricQuantity * 1;
 			}
 		}
 		this.fee += this.feeRate;
-		this.Record(roomId,startTime,speed,feeRate);
+		this.Record(roomId,startTime.format(date),speed,feeRate);
 		return true;
 	}
 	
@@ -78,7 +81,7 @@ public class Client {
         return null;
     }
 
-	public void Record(String roomId, SimpleDateFormat startTime, int fanSpeed, float feeRate) {
+	public void Record(String roomId, String startTime, int fanSpeed, float feeRate) {
 		this.detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);
 	}
 
