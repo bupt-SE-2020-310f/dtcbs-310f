@@ -12,6 +12,7 @@ public class Client {
 	float fee;
 	float feeRate;
 	int duration;
+	Timer timer = null;
     int priority;   // smaller value has lower priority
 
 	DetailForm detailForm;
