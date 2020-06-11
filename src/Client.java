@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat;
  */
 public class Client {
 	boolean on;
+	String id;
+	String rmId;
 	float fee;
 	float feeRate;
 	int duration;
@@ -28,7 +30,15 @@ public class Client {
 
 
 	DetailForm detailForm;
-	
+
+	Client(String rmId, String id, float currTmep){
+		this.rmId = rmId;
+		this.id = id;
+		this.currentTemp = currTmep;
+		this.priority = 0;
+		this.fee = 0;
+	}
+
 	Client(int fanSpeed, int targetTemp, float currentTemp) {
         this.fanSpeed = fanSpeed;
         this.targetTemp = targetTemp;

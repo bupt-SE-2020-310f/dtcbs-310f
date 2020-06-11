@@ -7,6 +7,8 @@ import org.apache.http.message.BasicHttpRequest;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.message.BasicHttpResponse;
 
+import java.util.Calendar;
+
 public class Test {
     public static void main(String[] args){
 /*        BasicHttpRequest request = new BasicHttpRequest("GET", "/",
@@ -26,8 +28,10 @@ public class Test {
 
         HeaderIterator it = response.headerIterator("Set-Cookie");
 
-        while (it.hasNext()) {
-            System.out.println(it.next());
-        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),1,0,0,0);
+        long tt = System.currentTimeMillis() - calendar.getTime().getTime();
+        System.out.println((int)tt);
+
     }
 }

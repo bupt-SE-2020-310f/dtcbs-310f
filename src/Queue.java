@@ -92,6 +92,7 @@ public class Queue {
     public void Exchange(String rmId1, String rmId2) {
         Client client1 = this.Pop(rmId1);
         Client client2 = this.tother.Pop(rmId2);
+        System.out.printf("Changed %s in and %s.\n", rmId1, rmId2);
         this.Add(rmId2, client2);
         this.tother.Add(rmId1, client1);
     }

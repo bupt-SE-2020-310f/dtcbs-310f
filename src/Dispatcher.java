@@ -21,16 +21,10 @@ import java.net.DatagramSocketImplFactory;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -50,9 +44,10 @@ import javax.swing.filechooser.FileSystemView;
  */
 public class Dispatcher extends HttpServerSys {
     int defaultTargetTemp;
-    HashMap<Long, Integer> roomId2id = new HashMap<>();
+    HashMap<String , String> roomId2id = new HashMap<>();
     Queue sQueue, wQueue;
     Server core;
+    Calendar calendar = Calendar.getInstance();
 
     Dispatcher(){
         super();
@@ -62,6 +57,9 @@ public class Dispatcher extends HttpServerSys {
         wQueue = new WaitClientQueue();
         sQueue.tother = wQueue;
         wQueue.tother = sQueue;
+
+        calendar = Calendar.getInstance();
+        calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),1,0,0,0);
     }
 
 
@@ -97,184 +95,270 @@ public class Dispatcher extends HttpServerSys {
                 String type = typeAndArgs[0];
                 String[] args = typeAndArgs[1].split("&");
 
-                if (method.equals("GET")) {
-                    if (type.equals("fee")) {
-                        String[] values = new String[3];
-                        JSONObject jsonFee = new JSONObject();
-                        JSONObject jsonData = new JSONObject();
-                        for (int i = 0; i < args.length; i++) {
-                            //id & currentTemperature & changeTemperature
-                            values[i] = (args[i].split("=")[1]);
+                try{
+                    if (method.equals("GET")) {
+                        if (type.equals("fee")) {
+                            String[] values = new String[3];
+                            JSONObject jsonFee = new JSONObject();
+                            JSONObject jsonData = new JSONObject();
+                            for (int i = 0; i < args.length; i++) {
+                                //id & currentTemperature & changeTemperature
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            String id = values[0];
+                            float currT = Float.parseFloat(values[1]);
+                            float changeT = Integer.parseInt(values[2]);
+                            float fee = 0;
+                            int targetT = this.ctrl.core.defaultTargetTemp;
+                            int rs = 2;//0 服务，1 等待，2 待机
+                            if (sQ().IsIn(id)){
+                                fee = sQ().Get(id).fee;
+                                targetT = sQ().Get(id).targetTemp;
+                                rs = 0;
+                            } else if (wQ().IsIn(id)){
+                                fee = wQ().Get(id).fee;
+                                targetT = sQ().Get(id).targetTemp;
+                                rs = 1;
+                            }
+                            Update(id, targetT, currT);
+                            if (sQ().IsIn(id)) { rs = 0; } else if (wQ().IsIn(id)){ rs = 1; }
+
+                            jsonFee.put("status", 0);
+                            jsonFee.put("msg", "成功");
+                            jsonData.put("fee", fee);
+                            jsonData.put("roomState", rs);
+                            jsonData.put("id", id);
+                            jsonFee.put("data", jsonData);
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonFee));
+                            System.out.println("Fee request Room:" + this.ctrl.roomId2id.get(id));
                         }
-                        String id = values[0];
-                        float currT = Float.parseFloat(values[1]);
-                        float changeT = Float.parseFloat(values[2]);
-                        float fee = 0;
-                        int rs = 2;
-                        if (sQ().IsIn(id)){
-                            Client c = sQ().Get(id);
-                            //c.Update(currT, changeT);
-                            fee = sQ().Get(id).fee;
-                            rs = 0;
-                        } else if (wQ().IsIn(id)){
-                            Client c = sQ().Get(id);
-                            //c.Update(currT, changeT);
-                            fee = wQ().Get(id).fee;
-                            rs = 1;
-                        }
-                        jsonFee.put("status", 0);
-                        jsonFee.put("msg", "成功");
-                        jsonData.put("fee", fee);
-                        jsonData.put("roomState", rs);
-                        jsonData.put("id", id);
-                        jsonFee.put("data", jsonData);
-                        response.setStatusCode(HttpStatus.SC_OK);
-                        response.setEntity(sendBack(jsonFee));
-                        System.out.println("Fee request " + " Room 5");
                     }
-                }
-                else if (method.equals("PUT")) {
-                    if (type.equals("service")) {
-                        String[] values = new String[1];
-                        for (int i = 0; i < args.length; i++) {
-                            values[i] = (args[i].split("=")[1]);
+                    else if (method.equals("PUT")) {
+                        if (type.equals("service")) {
+                            String[] values = new String[1];
+                            for (int i = 0; i < args.length; i++) {
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            String id = values[0];
+
+                            Update(id, 0, 0, 0);
+                            wQ().Get(id).on = false;
+
+                            JSONObject jsonShutdown = new JSONObject();
+                            jsonShutdown.put("status", 0);
+                            jsonShutdown.put("msg", "成功");
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonShutdown));
+                            System.out.println("Shutdown Room: " + this.ctrl.roomId2id.get(id));
+                        } else if (type.equals("exit")) {
+                            String[] values = new String[1];
+                            for (int i = 0; i < args.length; i++) {
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            String id = values[0];
+                            String rmId = this.ctrl.roomId2id.get(Integer.parseInt(id));
+
+                            this.ctrl.roomId2id.remove(Integer.parseInt(id));
+                            if (sQ().IsIn(id)){
+                                Client c = sQ().Pop(id);
+                                //c.ShutDown();
+                                if ((id = wQ().HasHighestPriority()) != null){
+                                    String idS = sQ().HasLowestPriority();
+                                    if (wQ().Get(id).priority > sQ().Get(idS).priority){
+                                        wQ().Exchange(idS, id);
+                                    }
+                                }
+                            } else if (wQ().IsIn(id)){
+                                Client c = wQ().Pop(id);
+                                //c.ShutDown();
+                            }
+
+                            JSONObject jsonExit = new JSONObject();
+                            jsonExit.put("status", 0);
+                            jsonExit.put("msg", "成功");
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonExit));
+                            System.out.println("Check out Room: " + rmId);
                         }
-                        String id = values[0];
-                        if (sQ().IsIn(id)){
-                            Client c = sQ().Pop(id);
-                            c.ShutDown();
-                            if ((id = wQ().HasHighestPriority()) != null){
-                                String idS = sQ().HasLowestPriority();
-                                if (wQ().Get(id).priority > sQ().Get(idS).priority){
-                                    wQ().Exchange(idS, id);
+                    }
+                    else {  //POST Request
+                        if (type.equals("initial")) {//Check in
+                            String[] values = new String[3];
+                            for (int i = 0; i < args.length; i++) {
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            String rmId = values[0];
+                            float currT = Float.parseFloat(values[1]);
+                            int id = (int) (System.currentTimeMillis() - this.ctrl.calendar.getTime().getTime());
+                            Client c = new Client(rmId, String.valueOf(id), currT);
+
+                            wQ().Add(String.valueOf(id), c);
+                            for (Iterator<HashMap.Entry<String, String>> it = this.ctrl.roomId2id.entrySet().iterator();
+                                 it.hasNext();){
+                                HashMap.Entry<String, String> item = it.next();
+                                String key = item.getKey();
+                                String val = item.getValue();
+
+                                if (val.equals(rmId)) {
+                                    id = Integer.parseInt(key);
+                                    break;
                                 }
                             }
-                        } else if (wQ().IsIn(id)){
-                            Client c = sQ().Pop(id);
-                            c.ShutDown();
-                        }
-                        JSONObject jsonShutdown = new JSONObject();
-                        jsonShutdown.put("status", 0);
-                        jsonShutdown.put("msg", "成功");
-                        response.setStatusCode(HttpStatus.SC_OK);
-                        response.setEntity(sendBack(jsonShutdown));
-                        System.out.println("Shutdown " + " Room 5");
-                    } else if (type.equals("exit")) {
-                        String[] values = new String[1];
-                        for (int i = 0; i < args.length; i++) {
-                            values[i] = (args[i].split("=")[1]);
-                        }
-                        String id = values[0];
-                        String rmId = "";
+                            this.ctrl.roomId2id.put(String.valueOf(id), rmId);
 
-                        if (sQ().IsIn(id)){
-                            Client c = sQ().Pop(id);
-                            c.ShutDown();
-                            if ((id = wQ().HasHighestPriority()) != null){
-                                String idS = sQ().HasLowestPriority();
-                                if (wQ().Get(id).priority > sQ().Get(idS).priority){
-                                    wQ().Exchange(idS, id);
-                                }
+                            JSONObject jsonCheckIn = new JSONObject();
+                            JSONObject jsonData = new JSONObject();
+                            jsonCheckIn.put("status", 0);
+                            jsonCheckIn.put("msg", "成功");
+                            jsonData.put("id", id);
+                            jsonData.put("highestTemperature", this.ctrl.core.tempHighLimit);
+                            jsonData.put("lowestTemperature", this.ctrl.core.tempLowLimit);
+                            jsonData.put("defaultFanSpeed", 1);
+                            jsonData.put("defaultTargetTemperature", this.ctrl.core.defaultTargetTemp);
+                            jsonCheckIn.put("data", jsonData);
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonCheckIn));
+                            System.out.println("Check in" + " Room " + values[0] + " id: " + String.valueOf(id));
+                        } else if (type.equals("service")) {
+                            String[] values = new String[3];
+                            for (int i = 0; i < args.length; i++) {
+                                values[i] = (args[i].split("=")[1]);
                             }
-                        } else if (wQ().IsIn(id)){
-                            Client c = sQ().Pop(id);
-                            c.ShutDown();
-                        }
-                        Iterator iter = this.ctrl.roomId2id.entrySet().iterator();
-                        while (iter.hasNext()){
-                            Map.Entry entry = (Map.Entry) iter.next();
-                            String val = (String) entry.getValue();
-                            if (val.equals(id)){
-                                rmId = (String) entry.getKey();
-                                iter.remove();
+                            String id = values[0];
+                            int targetT = Integer.parseInt(values[1]);
+                            int targetSpd = Integer.parseInt(values[2]);
+
+                            Update(id, targetSpd, targetT);
+
+                            JSONObject jsonExit = new JSONObject();
+                            jsonExit.put("status", 0);
+                            jsonExit.put("msg", "成功");
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonExit));
+                            System.out.println("Boot" + " Room: " + id);
+                        } else if (type.equals("temp")) {
+                            String[] values = new String[2];
+                            for (int i = 0; i < args.length; i++) {
+                                values[i] = (args[i].split("=")[1]);
                             }
+                            String id = values[0];
+                            int targetT = Integer.parseInt(values[1]);
+
+                            Update(id, targetT);
+
+                            JSONObject jsonTemp = new JSONObject();
+                            jsonTemp.put("status", 0);
+                            jsonTemp.put("msg", "成功");
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonTemp));
+                            System.out.println("Adjust temperature Room: " + this.ctrl.roomId2id.get(id));
+                        } else if (type.equals("fan")) {
+                            String[] values = new String[3];
+                            for (int i = 0; i < args.length; i++) {
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            String id = values[0];
+                            int speed = Integer.parseInt(values[1]);
+                            int temp;
+
+                            if (wQ().IsIn(id)){
+                                temp = wQ().Get(id).targetTemp;
+                            } else {
+                                temp = sQ().Get(id).targetTemp;
+                            }
+                            Update(id, speed, temp);
+
+                            JSONObject jsonFan = new JSONObject();
+                            jsonFan.put("status", 0);
+                            jsonFan.put("msg", "成功");
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonFan));
+                            System.out.println("Adjust speed Room " + this.ctrl.roomId2id.get(id));
                         }
-                        JSONObject jsonExit = new JSONObject();
-                        jsonExit.put("status", 0);
-                        jsonExit.put("msg", "成功");
-                        response.setStatusCode(HttpStatus.SC_OK);
-                        response.setEntity(sendBack(jsonExit));
-                        System.out.println("Check out " + rmId);
                     }
+                    System.out.print("\n");
+                } catch (NumberFormatException e){
+                    System.err.print("Wrong uri params from client: " + request.getRequestLine() + "\n");
                 }
-                else {  //POST Request
-                    if (type.equals("initial")) {//Check in
-                        String[] values = new String[3];
-                        for (int i = 0; i < args.length; i++) {
-                            values[i] = (args[i].split("=")[1]);
-                        }
-                        Long rmId = Long.parseLong(values[0]);
-                        float currT = Float.parseFloat(values[1]);
-                        Client c = new Client(1, (int)currT, currT);
-                        int id = (int) System.currentTimeMillis();
 
-                        this.ctrl.roomId2id.put(rmId, id);
-                        JSONObject jsonCheckIn = new JSONObject();
-                        JSONObject jsonData = new JSONObject();
-                        jsonCheckIn.put("status", 0);
-                        jsonCheckIn.put("msg", "成功");
-                        jsonData.put("id", id);
-                        jsonData.put("highestTemperature", this.ctrl.core.tempHighLimit);
-                        jsonData.put("lowestTemperature", this.ctrl.core.tempLowLimit);
-                        jsonData.put("defaultFanSpeed", 1);
-                        jsonData.put("defaultTargetTemperature", this.ctrl.core.defaultTargetTemp);
-                        jsonCheckIn.put("data", jsonData);
-                        response.setStatusCode(HttpStatus.SC_OK);
-                        response.setEntity(sendBack(jsonCheckIn));
-                        System.out.println("Check in" + " Room " + values[0] + " id: " + String.valueOf(id));
-                    } else if (type.equals("service")) {
-                        String[] values = new String[3];
-                        for (int i = 0; i < args.length; i++) {
-                            values[i] = (args[i].split("=")[1]);
-                        }
-                        String id = values[0];
-                        int targetT = Integer.parseInt(values[1]);
-                        int targetSpd = Integer.parseInt(values[2]);
-                        Client c = new Client(targetSpd, targetT, )
-                        JSONObject jsonExit = new JSONObject();
-                        jsonExit.put("status", 0);
-                        jsonExit.put("msg", "成功");
-                        response.setStatusCode(HttpStatus.SC_OK);
-                        response.setEntity(sendBack(jsonExit));
-                        System.out.println("Boot" + " Room 5");
-                    } else if (type.equals("temp")) {
-                        String[] values = new String[3];
-                        for (int i = 0; i < args.length; i++) {
-                            values[i] = (args[i].split("=")[1]);
-                        }
-                        /*
-
-                         */
-                        JSONObject jsonTemp = new JSONObject();
-                        jsonTemp.put("status", 0);
-                        jsonTemp.put("msg", "成功");
-                        response.setStatusCode(HttpStatus.SC_OK);
-                        response.setEntity(sendBack(jsonTemp));
-                        System.out.println("Adjust speed " + "room " + (values[0]));
-                    } else if (type.equals("fan")) {
-                        String[] values = new String[3];
-                        for (int i = 0; i < args.length; i++) {
-                            values[i] = (args[i].split("=")[1]);
-                        }
-                        /*
-
-                         */
-                        JSONObject jsonFan = new JSONObject();
-                        jsonFan.put("status", 0);
-                        jsonFan.put("msg", "成功");
-                        response.setStatusCode(HttpStatus.SC_OK);
-                        response.setEntity(sendBack(jsonFan));
-                        System.out.println("Adjust speed " + "room " + (values[0]));
-                    }
-                }
             }
         }
-        private Queue sQ(){
-            return sQ();
+        private ServeClientQueue sQ(){
+            return (ServeClientQueue) this.ctrl.sQueue;
         }
         
-        private Queue wQ(){
-            return wQ();
+        private WaitClientQueue wQ(){
+            return (WaitClientQueue) this.ctrl.wQueue;
+        }
+
+        private void Update(String id, int temp) {
+            Client c;
+            if (sQ().IsIn(id)){
+                c = sQ().Get(id);
+            } else {
+                c = wQ().Get(id);
+            }
+            c.targetTemp = temp;
+        }
+
+        private void Update(String id, int fanSpd, int temp){
+            Client c;
+            if (sQ().IsIn(id)){
+                c = sQ().Get(id);
+            } else {
+                c = wQ().Get(id);
+            }
+            c.fanSpeed = fanSpd;
+            c.priority = fanSpd;
+            c.targetTemp = temp;
+            while (Dispatch());
+        }
+
+        private void Update(String id, int temp, float currT){
+            Client c;
+            if (sQ().IsIn(id)){
+                c = sQ().Get(id);
+            } else {
+                c = wQ().Get(id);
+            }
+            if ((this.ctrl.core.mode == 0 && temp - currT < 1e-1 && sQ().IsIn(c.id))
+                    || (this.ctrl.core.mode == 1 && currT - temp < 1e-1 && sQ().IsIn(c.id)) ){
+                c.priority = 0;
+            }
+            c.targetTemp = temp;
+            c.currentTemp = currT;
+            while (Dispatch());
+        }
+
+        private void Update(String id, int fanSpd, int temp, float currT){
+            Client c;
+            if (sQ().IsIn(id)){
+                c = sQ().Get(id);
+            } else {
+                c = wQ().Get(id);
+            }
+            c.priority = fanSpd;
+            if ((this.ctrl.core.mode == 0 && temp - currT < 1e-1 && sQ().IsIn(c.id))
+                    || (this.ctrl.core.mode == 1 && currT - temp < 1e-1 && sQ().IsIn(c.id)) ){
+                c.priority = 0;
+            }
+            c.fanSpeed = fanSpd;
+            c.targetTemp = temp;
+            c.currentTemp = currT;
+            while (Dispatch());
+        }
+
+        private boolean Dispatch(){
+            if(wQ().queueLength > 0){
+                String wId = wQ().HasHighestPriority();
+                String sId = sQ().HasLowerPriority(wQ().Get(wId).priority);
+                if (sId != null){
+                    sQ().Exchange(sId, wId);
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
