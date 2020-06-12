@@ -17,9 +17,11 @@ public class Queue {
     Map<String, Client> roomInfo;
     Queue tother;
     int waitTime;
+    public final static String QLOCK = "QLOCK";
 
     public Queue() {
         this.roomInfo = new LinkedHashMap<>();
+        this.waitTime = 2 * 60 * 1000; // 2min
     }
 
     /**
@@ -36,22 +38,25 @@ public class Queue {
      * Bind the room associated with roomId with a client,
      * and add the client to self.roomInfo.
      * Self.queueLength plus 1.
-     *
-     * @param roomId identifier of room
+     *  @param roomId identifier of room
      * @param speed target fan speed
      * @param temp target temperature
      * @param curTemp current temperature
      */
     public void Add(String roomId, int speed, int temp, float curTemp) {
+        if (roomId == null) {
+            return;
+        }
         this.roomInfo.put(roomId, new Client(speed, temp, curTemp));
         this.queueLength += 1;
     }
 
     public void Add(String roomId, Client client) {
-        if (client != null) {
-            this.roomInfo.put(roomId, client);
-            this.queueLength += 1;
+        if (roomId == null || client == null) {
+            return;
         }
+        this.roomInfo.put(roomId, client);
+        this.queueLength += 1;
     }
 
     /**
@@ -70,7 +75,7 @@ public class Queue {
      * @param roomId identifier of room to pop
      * @return the client, null if no such client exists
      */
-    public Client Pop(String roomId) {
+    public  Client Pop(String roomId) {
         Client client = this.roomInfo.remove(roomId);
         if (client != null) {
             queueLength -= 1;
@@ -87,6 +92,9 @@ public class Queue {
      * @param rmId2 identifier of room2
      */
     public void Exchange(String rmId1, String rmId2) {
+        if (!this.IsIn(rmId1) || !this.tother.IsIn(rmId2)) {
+            return;
+        }
         Client client1 = this.Pop(rmId1);
         Client client2 = this.tother.Pop(rmId2);
         this.Add(rmId2, client2);
@@ -167,13 +175,16 @@ public class Queue {
 
     /**
      * Change target fan speed of target room.
+     * Put the client into tail of queue.
      *
      * @param roomId identifier of room
      * @param speed target fan speed
      */
     public void ChangeSpeed(String roomId, int speed) {
         if (IsIn(roomId)) {
-            this.roomInfo.get(roomId).fanSpeed = speed;
+            Client client = this.Pop(roomId);
+            client.fanSpeed = speed;
+            this.Add(roomId, client);
         }
     }
 
@@ -185,22 +196,37 @@ public class Queue {
      */
     public void ChangeTemp(String roomId, int temp) {
         if (IsIn(roomId)) {
-            this.roomInfo.get(roomId).targetTemp = temp;
+            this.Get(roomId).targetTemp = temp;
         }
     }
 
     /**
      * When a client has waitted for a time slice in waitQ, this method will be invoked by Timer class.
      * This client will be exchanged with a target client in serveQ,
-     * target client has the lowest priority, if priorities are equal, select the first one.
+     * target client has the lower or the same priority, if priorities are equal, select the first one.
+     * If no such target client, then do nothing.
      *
      * @param roomId identifier of room in timeout
      */
     public void TimeOut(String roomId) {
         if (this instanceof WaitClientQueue && this.IsIn(roomId)) {
-            // exchange this client in waitQ with client having lowest priority in serveQ
-            String roomId2 = this.tother.HasLowestPriority();
+            // exchange this client in waitQ with client having lower or the same priority in serveQ
+            int level = -1;
+            if (this.Get(roomId) != null) {
+                level = this.Get(roomId).fanSpeed;
+            }
+            String roomId2 = ((ServeClientQueue)this.tother).HasLowerPriority(level+1);
+            if (roomId2 == null) {
+                return;
+            }
             this.Exchange(roomId, roomId2);
+            for (String id : this.roomInfo.keySet()) {
+                Client client = this.Get(id);
+                if (client.timer != null && client.timer.waitTime < waitTime/2) {
+                    client.timer.TimeCancel();
+                    client.timer = null;
+                }
+            }
         }
     }
 }

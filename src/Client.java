@@ -11,6 +11,7 @@ public class Client {
     int fanSpeed; // also as priority: 0,1,2, smaller value has lower fanSpeed/priority
     int targetTemp;
     float currentTemp;
+    Timer timer = null;
 
     public Client(int fanSpeed, int targetTemp, float currentTemp) {
         this.fanSpeed = fanSpeed;
