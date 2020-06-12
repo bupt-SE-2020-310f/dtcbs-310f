@@ -6,6 +6,7 @@
  */
 public class Timer {
     Thread timeThread;
+    int waitTime;
 
     /**
      * Initialize the timer for client at roomId.
@@ -15,12 +16,15 @@ public class Timer {
      * @param queue timer attched to the queue, and used for callback
      */
     public Timer(String roomId, int time, Queue queue) {
+        waitTime = time;
         timeThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(time);
-                    queue.TimeOut(roomId);
+                    synchronized (Queue.QLOCK) {
+                        queue.TimeOut(roomId);
+                    }
                 } catch (InterruptedException ignored) {
 
                 }

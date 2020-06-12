@@ -12,6 +12,9 @@ public class WaitClientQueue extends Queue {
      */
     @Override
     public void Add(String roomId, int speed, int temp, float curTemp) {
+        if (roomId == null) {
+            return;
+        }
         Client client = new Client(speed, temp, curTemp);
         client.timer = new Timer(roomId, waitTime, this);
         client.timer.TimeSet();
@@ -21,7 +24,7 @@ public class WaitClientQueue extends Queue {
 
     @Override
     public void Add(String roomId, Client client) {
-        if (client == null) {
+        if (roomId == null || client == null) {
             return;
         }
         client.timer = new Timer(roomId, waitTime, this);
@@ -34,7 +37,7 @@ public class WaitClientQueue extends Queue {
      * Override method, cancel timer and set as null.
      */
     @Override
-    public Client Pop(String roomId) {
+    public  Client Pop(String roomId) {
         Client client = this.roomInfo.remove(roomId);
         if (client != null) {
             queueLength -= 1;
