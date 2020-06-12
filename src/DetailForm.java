@@ -1,4 +1,3 @@
-package test;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -68,10 +67,10 @@ public class DetailForm {
         	DateIn = resultSet.getString(2);
         	DateOut = resultSet.getString(3);
         	TotalFee = resultSet.getFloat(4);
-        	System.out.println("RoomId："+RoomId);
-        	System.out.println("RoomId："+DateIn);
-        	System.out.println("DateOut："+DateOut);
-        	System.out.println("DateOut："+TotalFee);
+        	System.out.println("RoomId:"+RoomId);
+        	System.out.println("RoomId:"+DateIn);
+        	System.out.println("DateOut:"+DateOut);
+        	System.out.println("DateOut:"+TotalFee);
         	Invoice Invoice = new Invoice(RoomId,DateIn,DateOut,TotalFee);
         	return Invoice;
 	    }
@@ -122,11 +121,11 @@ public class DetailForm {
             	
                 RDR RDR= new RDR(RoomId, RequestTime, RequestDuration, FanSpeed, FeeRate);
                 listRDR.add(RDR);
-                System.out.println("roomId："+RoomId);
-                System.out.println("RequestTime："+RequestTime);
-                System.out.println("RequestDuration："+RequestDuration);
-                System.out.println("FanSpeed："+FanSpeed);
-                System.out.println("FeeRate："+FeeRate);
+                System.out.println("roomId:"+RoomId);
+                System.out.println("RequestTime:"+RequestTime);
+                System.out.println("RequestDuration:"+RequestDuration);
+                System.out.println("FanSpeed:"+FanSpeed);
+                System.out.println("FeeRate:"+FeeRate);
             }
         } catch (Exception e) {
             e.printStackTrace();
