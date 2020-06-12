@@ -111,6 +111,7 @@ public class EasyTest {
                             }
                         }
                     }
+                    //check sQ's states
                     List<String> sKeys = new ArrayList<>(sQ.roomInfo.keySet());
                     for (String roomId : sKeys) {
                         Client client = sQ.Get(roomId);
@@ -131,6 +132,7 @@ public class EasyTest {
                             stateStr[Integer.parseInt(roomId)-1] = String.format("|\tS%.2f\t|\t%d\t\t|\t%s\t\t", client.currentTemp, targetT, speedText[speed]);
                         }
                     }
+                    //check wQ's states
                     List<String> wKeys = new ArrayList<>(wQ.roomInfo.keySet());
                     for (String roomId : wKeys) {
                         Client client = wQ.Get(roomId);
@@ -142,6 +144,7 @@ public class EasyTest {
                             wQ.Get(roomId).timer.waitTime -= timeSlice/2;
                         }
                     }
+                    // print states
                     for (String state : stateStr) {
                         if (state == null) {
                             System.out.print("|\t\t\t\t\t\t\t\t\t");
