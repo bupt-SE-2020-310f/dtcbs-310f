@@ -18,7 +18,6 @@ public class Server {
     float feeRateL;
 
     Server(){
-
     }
     Server(int mode, int tempHighLimit, int tempLowLimit,
            int defaultTargetTemp, float feeRateH,
