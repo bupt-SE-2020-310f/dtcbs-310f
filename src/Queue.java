@@ -16,11 +16,12 @@ public class Queue {
     int queueLength;
     Map<String, Client> roomInfo;
     Queue tother;
-    int waitTime = 2*60*1000; // 2min
+    int waitTime;
     public final static String QLOCK = "QLOCK";
 
     public Queue() {
         this.roomInfo = new LinkedHashMap<>();
+        this.waitTime = 2 * 60 * 1000; // 2min
     }
 
     /**
