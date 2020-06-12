@@ -1,5 +1,3 @@
-package struct;
-
 public class Invoice {
 	String roomId;
 	String dateIn;

@@ -1,4 +1,3 @@
-package struct;
 public class Report {
 	//实体类的成员变量和数据库表的字段名称和类型一致
     private String RoomId;

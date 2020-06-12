@@ -1,4 +1,3 @@
-package struct;
 public class RDR {
 	private String RoomId;
 	private String RequestTime;

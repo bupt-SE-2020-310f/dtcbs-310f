@@ -287,7 +287,7 @@ public class Dispatcher extends HttpServerSys {
         private ServeClientQueue sQ(){
             return (ServeClientQueue) this.ctrl.sQueue;
         }
-        
+
         private WaitClientQueue wQ(){
             return (WaitClientQueue) this.ctrl.wQueue;
         }
@@ -394,5 +394,4 @@ public class Dispatcher extends HttpServerSys {
             }
         });
     }
-
 }

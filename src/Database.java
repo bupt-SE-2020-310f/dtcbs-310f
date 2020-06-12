@@ -1,7 +1,5 @@
-package test;
-
 public class Database {
-	String driverName="com.microsoft.sqlserver.jdbc.SQLServerDriver";//SQLÊý¾Ý¿âÒýÇæ
+	String driverName="com.microsoft.sqlserver.jdbc.SQLServerDriver";//SQLï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½
 	String url="jdbc:sqlserver://localhost:1433;DatabaseName=Information";
 	String user="310f";
 	String password="310f";
