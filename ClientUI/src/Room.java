@@ -1,17 +1,5 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.SocketException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.LinkedList;
-
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -19,9 +7,11 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.net.SocketException;
+import java.util.LinkedList;
 
 public class Room {
     private String host = "http://localhost:80";
@@ -214,17 +204,6 @@ public class Room {
             s = s.replaceFirst("\\*\\*", v);
         }
         return s;
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Room room = new Room();
-
-        //Thread.sleep(room.timeSlice);
-        room.checkIn();
-        room.boot();
-        room.cgFan();
-        room.fee();
-        room.checkOut();
     }
 
 }

@@ -44,7 +44,7 @@ import javax.swing.filechooser.FileSystemView;
  */
 public class Dispatcher extends HttpServerSys {
     int defaultTargetTemp;
-    HashMap<String , String> roomId2id = new HashMap<>();
+    HashMap<String , String> roomId2id = new HashMap<>();//id<-->roomId
     Queue sQueue, wQueue;
     Server core;
     Calendar calendar = Calendar.getInstance();
@@ -107,7 +107,7 @@ public class Dispatcher extends HttpServerSys {
                             }
                             String id = values[0];
                             float currT = Float.parseFloat(values[1]);
-                            float changeT = Integer.parseInt(values[2]);
+                            float changeT = Float.parseFloat(values[2]);
                             float fee = 0;
                             int targetT = this.ctrl.core.defaultTargetTemp;
                             int rs = 2;//0 服务，1 等待，2 待机
@@ -117,7 +117,7 @@ public class Dispatcher extends HttpServerSys {
                                 rs = 0;
                             } else if (wQ().IsIn(id)){
                                 fee = wQ().Get(id).fee;
-                                targetT = sQ().Get(id).targetTemp;
+                                targetT = wQ().Get(id).targetTemp;
                                 rs = 1;
                             }
                             Update(id, targetT, currT);
@@ -221,7 +221,7 @@ public class Dispatcher extends HttpServerSys {
                             response.setEntity(sendBack(jsonCheckIn));
                             System.out.println("Check in" + " Room " + values[0] + " id: " + String.valueOf(id));
                         } else if (type.equals("service")) {
-                            String[] values = new String[3];
+                            String[] values = new String[4];
                             for (int i = 0; i < args.length; i++) {
                                 values[i] = (args[i].split("=")[1]);
                             }
@@ -229,7 +229,7 @@ public class Dispatcher extends HttpServerSys {
                             int targetT = Integer.parseInt(values[1]);
                             int targetSpd = Integer.parseInt(values[2]);
 
-                            Update(id, targetSpd, targetT);
+                            //Update(id, targetSpd, targetT);
 
                             JSONObject jsonExit = new JSONObject();
                             jsonExit.put("status", 0);
@@ -282,6 +282,15 @@ public class Dispatcher extends HttpServerSys {
                     System.err.print("Wrong uri params from client: " + request.getRequestLine() + "\n");
                 }
 
+            }
+            else if (paths[1].equals("state")){
+                HashMap<String, String[]> map = new HashMap<String, String[]>();
+                String[] strs = new String[6];
+                List<String> req = new LinkedList<>(this.ctrl.roomId2id.values());
+                List<RoomState> roomStates = wQ().CheckRoomState(req);
+                for (int i = 0; i < roomStates.size(); i++){
+
+                }
             }
         }
         private ServeClientQueue sQ(){
@@ -364,7 +373,7 @@ public class Dispatcher extends HttpServerSys {
 
     public static void main(String[] args) throws Exception {
 
-        int port = 8080;
+        int port = 80;
         Dispatcher dispa = new Dispatcher();
 
         if (args.length >= 1) {

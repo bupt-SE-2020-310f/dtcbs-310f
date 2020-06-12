@@ -16,6 +16,7 @@ import java.util.Date;
  * these rooms are in service or waitting for service.
  *
  * @author zyl
+ * @author Ziheng Ni
  * @since 9 June 2020
  */
 public class Client {
@@ -127,7 +128,18 @@ public class Client {
      * @return the information
      */
     public RoomState GetRoomState() {
-        return null;
+    	RoomState rs = new RoomState();
+    	rs.fee = this.fee;
+    	rs.roomId = this.rmId;
+    	rs.targetTemp = this.targetTemp;
+    	rs.currTemp = this.currentTemp;
+    	rs.fan = this.fanSpeed;
+    	if (this.on){
+    		rs.state = 1;
+		} else {
+    		rs.state = 0;
+		}
+        return rs;
     }
 
 	public void Record(String roomId, String startTime, int fanSpeed, float feeRate) {
