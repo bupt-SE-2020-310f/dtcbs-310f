@@ -1,3 +1,4 @@
+import struct.Invoice;
 import struct.RDR;
 import struct.Report;
 import struct.RoomState;
@@ -8,7 +9,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
+
 
 public class Server {
     static int mode; // 0-heat, 1-cool
@@ -192,40 +195,35 @@ public class Server {
         return listReport;
     }
 
-
-
     public List<RoomState> CheckRoomState(List<Integer> listRoomId) {
         return null;
     }
 
+
+    public boolean PowerOn() {
+        return false;
+    }
+    
     public boolean DeleteReport(int ReportId, String date) {
+    	Database db = new Database();
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
+            Class.forName(db.driverName);
+            connection = DriverManager.getConnection(db.url, db.user, db.password);
 
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "DELETE FROM Report WHERE id=?";
+            String sql = "DELETE FROM Record WHERE id=?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,ReportId);
-
             return true;
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
             try {
-                if(preparedStatement != null){
-                    preparedStatement.close();
-                }
+            	preparedStatement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
             try {
                 if(connection != null){
                     connection.close();
@@ -234,72 +232,78 @@ public class Server {
                 e.printStackTrace();
             }
         }
-        return false;
+		return false;
     }
-
-
-    public boolean PowerOn() {
-        return false;
-    }
-
-
-    public boolean PrintRDR(int roomId, Time dateIn, Time dateOut) {
-        return false;
-    }
-
-/*    public struct.Invoice QueryInvoice(int roomId, String StringIn, String StringOut) {
-        return null;
-    }*/
-
-    public boolean PrintRDR(int roomId, String dateIn, String dateOut) {
-        List<RDR> listReport = new ArrayList<RDR>();
-
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-
-        try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
-
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "SELECT * FROM Report where id=roomId";
-            preparedStatement = connection.prepareStatement(sql);
-
-            resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-                String RoomId = resultSet.getString(1);
-                String RequestTime = resultSet.getString(2);
-                int RequestDuration = resultSet.getInt(3);
-                int FanSpeed = resultSet.getInt(4);
-                int FeeRate = resultSet.getInt(5);
-                int Fee = resultSet.getInt(6);
-                RDR listRDR= new RDR(RoomId,RequestTime,RequestDuration,FanSpeed,FeeRate,Fee);
-                listReport.add(listRDR);
-            }
-
+    
+    public boolean PrintReport(Date date, List<String> listRoomId, String typeReport) {
+    	try {
+    		List<Report> listReport = new ArrayList<Report>();
+    		listReport = this.QueryReport(date, listRoomId, typeReport);
             FileSystemView fsv = FileSystemView.getFileSystemView();
             File com = fsv.getHomeDirectory();
             String deskPath = com.getPath();
-            File file = new File( deskPath + "\\" + "310fRDR.txt" );
+            File file = new File( deskPath + "\\" + "310fReport.txt" );
             BufferedWriter bw = null;
             try {
-                bw = new BufferedWriter( new FileWriter(file) );
-                for(int i = 0; i < listReport.size(); i++ ) {
-                    bw.write( listReport.get(i).toString() );
-                    bw.newLine();
-                }
-                bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            	bw = new BufferedWriter( new FileWriter(file) );
+            	for(int i = 0; i < listReport.size(); i++ ) {
+            		bw.write( listReport.get(i).toString() );
+            		bw.newLine();
+            		}
+            	bw.close();
+            	} catch (IOException e) {
+            		e.printStackTrace();
+            	}
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Report> QueryReport(Date date, List<String> listRoomId, String typeReport){
+    	Database db = new Database();
+    	List<Report> listReport = new ArrayList<Report>();
+    	
+		Connection connection = null;
+    	PreparedStatement preparedStatement = null;
+    	ResultSet resultSet = null;
+    	
+        try {
+            Class.forName(db.driverName);
+            connection = DriverManager.getConnection(db.url, db.user, db.password);
+	    	for(int i=0; i<listRoomId.size(); i++) {
+	            String roomId = listRoomId.get(i);
+	            String sql = "SELECT RoomId,sum(FeeRate) as TotalFee,count(StartTime) as NumberOfRDR,"
+	            		+ "count(StartTime) as TimesOfOnOff,count(StartTime) as TimesOfDisPatch,"
+	            		+ "count(StartTime) as TimesOfChangeTemp,count(distinct FanSpeed) as TimesOfChangeFanSpeed"
+	            		+ "sum((Termination-StartTime)sec) as Duration"
+	            		+ "from Record where RoomId="+roomId;
+	            preparedStatement = connection.prepareStatement(sql);
+	            resultSet = preparedStatement.executeQuery();
+	            while(resultSet.next()) {
+	            	String RoomId = resultSet.getString(1);
+	            	float TotalFee = resultSet.getFloat(2);
+	            	int NumberOfRDR = resultSet.getInt(3);
+	            	int TimesOfOnOff = resultSet.getInt(4);
+	            	int TimesOfDisPatch = resultSet.getInt(5);
+	            	int TimesOfChangeTemp = resultSet.getInt(6);
+	            	int TimesOfChangeFanSpeed = resultSet.getInt(7);
+	            	int Duration = resultSet.getInt(8);
+	            	Report Report = new Report(RoomId,TotalFee,NumberOfRDR,TimesOfOnOff,TimesOfDisPatch,TimesOfChangeTemp,TimesOfChangeFanSpeed,Duration);
+	            	listReport.add(Report);
+	            	System.out.println("roomId��"+RoomId);
+	            	System.out.println("TotalFee��"+TotalFee);
+	            	System.out.println("NumberOfRDR��"+NumberOfRDR);
+	            	System.out.println("TimesOfOnOff��"+TimesOfOnOff);
+	            	System.out.println("TimesOfDisPatch��"+TimesOfDisPatch);
+	            	System.out.println("TimesOfChangeTemp��"+TimesOfChangeTemp);
+	            	System.out.println("TimesOfChangeFanSpeed��"+TimesOfChangeFanSpeed);
+	            	System.out.println("Duration��"+Duration);
+	            }
+	            
+	    	}
+    	} catch (Exception e) {
             e.printStackTrace();
         } finally{
             try {
@@ -326,70 +330,70 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    	return listReport;
+	}
 
-        return false;
+    public boolean PrintRDR(String roomId, String dateIn, String dateOut) {
+    	List<RDR> listReport = new ArrayList<RDR>();
+    	DetailForm RDR = new DetailForm();
+    	listReport = RDR.QueryRDR(roomId, dateIn, dateOut);
+    	FileSystemView fsv = FileSystemView.getFileSystemView();
+        File com = fsv.getHomeDirectory();
+        String deskPath = com.getPath();
+        File file = new File( deskPath + "\\" + "310fRDR.txt" );
+        BufferedWriter bw = null;
+        try {
+        	bw = new BufferedWriter( new FileWriter(file) );
+        	for(int i = 0; i < listReport.size(); i++ ) {
+        		bw.write( listReport.get(i).toString() );
+        		bw.newLine();
+        		}
+        	bw.close();
+        	return true;
+        	} catch (IOException e) {
+        		e.printStackTrace();
+        		return false;
+        	}
+    }
+    
+    public List<RDR> QueryRDR(String roomId, String dateIn, String dateOut){
+    	try {
+    		List<RDR> listRDR = new ArrayList<RDR>();
+    		DetailForm df = new DetailForm();
+    		listRDR = df.QueryRDR(roomId, dateIn, dateOut);
+    		return listRDR;
+    	} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+    }
+    
+    public Invoice QueryInvoice(String roomId, String dateIn ,String dateOut){
+    	DetailForm df = new DetailForm();
+		return df.MakeInvoice(roomId, dateIn, dateOut);
     }
 
-    public List<RDR> QueryRDR(int roomId, String dateIn, String dateOut){
-        try {
-            List<RDR> listRDR = new ArrayList<RDR>();
-            DetailForm df = new DetailForm();
-            listRDR = df.QueryRDR(String.valueOf(roomId), dateIn, dateOut);
-            return listRDR;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public boolean PrintInvoice(int roomId, String dateOut) {
-        try {
-            Map<String, Object> Invoice = new HashMap<String, Object>();
-            DetailForm df = new DetailForm();
-            //TODO
-//            Invoice = df.MakeInvoice(roomId, "0", dateOut);
-            String line = System.getProperty("line.separator");
-            StringBuffer str = new StringBuffer();
-            FileWriter fw = new FileWriter("C:\\310fInvoice.txt", true);
-            Set<Map.Entry<String, Object>> set = Invoice.entrySet();
-            Iterator<Map.Entry<String, Object>> iter = set.iterator();
-            while(iter.hasNext()){
-                @SuppressWarnings("rawtypes")
-                Map.Entry entry = (Map.Entry)iter.next();
-                str.append(entry.getKey()+" : "+entry.getValue()).append(line);
-            }
-            fw.write(str.toString());
-            fw.close();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public Map<String, Object> QueryInvoice(int roomId, String dateOut) {
-        try {
-            Map<String, Object> Invoice = new HashMap<String, Object>();
-            DetailForm df = new DetailForm();
-            //TODO
-//            Invoice = df.MakeInvoice(roomId, "0", dateOut);
-            String line = System.getProperty("line.separator");
-            StringBuffer str = new StringBuffer();
-            FileWriter fw = new FileWriter("C:\\310fInvoice.txt", true);
-            Set<Map.Entry<String, Object>> set = Invoice.entrySet();
-            Iterator<Map.Entry<String, Object>> iter = set.iterator();
-            while(iter.hasNext()){
-                @SuppressWarnings("rawtypes")
-                Map.Entry entry = (Map.Entry)iter.next();
-                str.append(entry.getKey()+" : "+entry.getValue()).append(line);
-            }
-            fw.write(str.toString());
-            fw.close();
-            return Invoice;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
+    public boolean PrintInvoice(String roomId, String dateIn ,String dateOut) {
+    	List<Invoice> listInvoice = new ArrayList<Invoice>();
+		DetailForm df = new DetailForm();
+		listInvoice.add(df.MakeInvoice(roomId, dateIn, dateOut));
+		
+		FileSystemView fsv = FileSystemView.getFileSystemView();
+		File com = fsv.getHomeDirectory();
+		String deskPath = com.getPath();
+		File file = new File( deskPath + "\\" + "310fInvoice.txt" );
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter( new FileWriter(file) );
+			for(int i = 0; i < listInvoice.size(); i++ ) {
+				bw.write( listInvoice.get(i).toString() );
+				bw.newLine();
+				}
+			bw.close();
+			return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
     }
 }

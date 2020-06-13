@@ -45,6 +45,23 @@ public class Client {
 		this.currentTime = startTime;
 		this.timer = null;
 	}
+  
+  Client(String rmId, String id, float currTmep, int fanSpeed, int targetTemp){
+		Systemut.println("!!!!!!!!!!!!!!!!!!");
+		this.rmId = rmId;
+		this.id = id;
+		this.currentTemp = currTmep;
+		this.priority = 0;
+		this.fee = 0;
+		this.fanSpeed = fanSpeed;
+        this.targetTemp = targetTemp;
+        System.out.println(this.rmId);
+        System.out.println(this.id);
+        System.out.println(this.currentTemp);
+        System.out.println(this.fanSpeed);
+        System.out.println(this.targetTemp);
+        //this.currentTemp = currentTemp;
+	}
 
 	public void Enable(int mode, int speed) {
 		Date date = new Date();
@@ -89,6 +106,7 @@ public class Client {
 	}
 
 
+
 	/**
 	 * Get information of the room associated with client.
 	 *
@@ -120,7 +138,8 @@ public class Client {
 	}
 
 	public void Record(String roomId, String startTime, int fanSpeed, float feeRate) {
-		this.detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);
+		DetailForm detailForm = new DetailForm();
+		detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);
 	}
 
 }

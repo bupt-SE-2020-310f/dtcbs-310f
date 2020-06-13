@@ -17,7 +17,7 @@ public class RDR {
         this.FeeRate = FeeRate;
         this.Fee = Fee;
     }
-    //创建每个成员变量的set和get方法
+    //鍒涘缓姣忎釜鎴愬憳鍙橀噺鐨剆et鍜実et鏂规硶
     public String getRoomId() {
         return RoomId;
     }

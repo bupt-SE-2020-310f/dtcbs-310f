@@ -14,8 +14,15 @@ import org.apache.http.protocol.HttpRequestHandler;
 import struct.RoomState;
 
 import java.io.IOException;
+import java.net.DatagramSocketImplFactory;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import java.util.Map.Entry;
+import javax.swing.filechooser.FileSystemView;
 
 
 /**
@@ -100,6 +107,7 @@ public class Dispatcher extends HttpServerSys {
                             float currT = Float.parseFloat(values[1]);
                             float changeT = Integer.parseInt(values[2]);
                             float fee = 0;
+
                             int targetT = Server.defaultTargetTemp;
                             int rs = 2;//0 服务，1 等待，2 待机
                             Client client = new Client();
@@ -151,6 +159,7 @@ public class Dispatcher extends HttpServerSys {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String id = values[0];
+
                             String rmId = this.ctrl.roomId2id.get(id);
 
                             this.ctrl.roomId2id.remove(id);
@@ -345,12 +354,8 @@ public class Dispatcher extends HttpServerSys {
                     c.priority = 0;
                     c.state = 2;
                 }
+
             }
-            c.fanSpeed = fanSpd;
-            c.priority = fanSpd;
-            c.targetTemp = temp;
-            c.currentTemp = currT;
-            while (Dispatch());
         }
 
         private boolean Dispatch(){
