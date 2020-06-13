@@ -324,6 +324,7 @@ public class Dispatcher extends HttpServerSys {
             if ((Server.mode == 0 && temp - currT < 1e-1 && sQ().IsIn(c.id))
                     || (Server.mode == 1 && currT - temp < 1e-1 && sQ().IsIn(c.id)) ){
                 c.priority = 0;
+                c.state = 2;
             }
             c.targetTemp = temp;
             c.currentTemp = currT;
@@ -342,6 +343,7 @@ public class Dispatcher extends HttpServerSys {
                 if ((Server.mode == 0 && temp - currT < 1e-1 && sQ().IsIn(c.id))
                         || (Server.mode == 1 && currT - temp < 1e-1 && sQ().IsIn(c.id)) ){
                     c.priority = 0;
+                    c.state = 2;
                 }
             }
             c.fanSpeed = fanSpd;

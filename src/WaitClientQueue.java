@@ -15,6 +15,7 @@ public class WaitClientQueue extends Queue {
         if (roomId == null || client == null) {
             return;
         }
+        client.state = 1;
         client.timer = new Timer(roomId, waitTime, this);
         client.timer.TimeSet();
         this.roomInfo.put(roomId, client);
@@ -29,6 +30,7 @@ public class WaitClientQueue extends Queue {
         Client client = this.roomInfo.remove(roomId);
         if (client != null) {
             queueLength -= 1;
+            client.state = 0;
             if (client.timer != null) {
                 client.timer.TimeCancel();
                 client.timer = null;

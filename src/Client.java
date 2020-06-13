@@ -26,6 +26,7 @@ public class Client {
 	long startTime;
 	long currentTime;
 	long preTime;
+	int state; // 0-serve, 1-wait, 2-standby
 	DetailForm detailForm;
 	Timer timer;
 
@@ -97,24 +98,24 @@ public class Client {
 		preTemp = currentTemp;
 		preTime = currentTime;
 		currentTime = System.currentTimeMillis();
-		if (Math.abs(currentTemp-targetTemp) < 1) { // recover limit: 1
+		if (state >= 1  && Math.abs(currentTemp-targetTemp) < 1) { // recover limit: 1
 			if (Server.mode == 0 && currentTemp >= targetTemp) { // heat
-				currentTemp -= 0.5;
+				currentTemp -= 0.5 * (float)(currentTime-preTime)/60000;
 			} else if (Server.mode == 1 && currentTemp <= targetTemp) { // cool
-				currentTemp += 0.5;
+				currentTemp += 0.5 * (float)(currentTime-preTime)/60000;
 			}
-		} else { // serve
+		} else if (state == 0){ // serve
 			if (Server.mode == 0 && currentTemp < targetTemp) { // heat
-				currentTemp += ((float)(currentTime-preTime)/6000) / fanSpeed;
+				currentTemp += ((float)(currentTime-preTime)/60000) / fanSpeed;
 			} else if (Server.mode == 1 && currentTemp > targetTemp) { // cool
-				currentTemp -= ((float)(currentTime-preTime)/6000) / fanSpeed;;
+				currentTemp -= ((float)(currentTime-preTime)/60000) / fanSpeed;;
 			}
 		}
 		duration += currentTemp - startTime;
 		if (timer != null) {
 			timer.waitTime -= currentTime - preTime;
 		}
-		fee += feeRate * (currentTemp - preTemp);
+		fee += feeRate * Math.abs(currentTemp - preTemp);
 		return new RoomState(on, id, rmId, fee, feeRate, duration, fanSpeed, targetTemp, currentTemp);
 	}
 
