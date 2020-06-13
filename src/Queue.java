@@ -88,7 +88,6 @@ public class Queue {
         }
         Client client1 = this.Pop(rmId1);
         Client client2 = this.tother.Pop(rmId2);
-        System.out.printf("Changed %s in and %s.\n", rmId1, rmId2);
         this.Add(rmId2, client2);
         this.tother.Add(rmId1, client1);
     }
@@ -108,8 +107,8 @@ public class Queue {
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
             Client client = this.Get(roomId);
-            if (client.fanSpeed < low) {
-                low = client.fanSpeed;
+            if (client.on && client.priority < low) {
+                low = client.priority;
                 id = roomId;
             }
         }
@@ -125,12 +124,12 @@ public class Queue {
      * @return identifier of target room
      */
     public String HasHighestPriority() {
-        int high = -1;
+        int high = -2;
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
             Client client = this.Get(roomId);
-            if (client.fanSpeed > high) {
-                high = client.fanSpeed;
+            if (client.on && client.priority > high) {
+                high = client.priority;
                 id = roomId;
             }
         }
@@ -207,7 +206,7 @@ public class Queue {
             // exchange this client in waitQ with client having lower or the same priority in serveQ
             int level = -1;
             if (this.Get(roomId) != null) {
-                level = this.Get(roomId).fanSpeed;
+                level = this.Get(roomId).priority;
             }
             String roomId2 = ((ServeClientQueue)this.tother).HasLowerPriority(level+1);
             if (roomId2 == null) {

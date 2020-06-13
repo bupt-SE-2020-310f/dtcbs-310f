@@ -18,33 +18,23 @@ public class Server {
     static int tempHighLimit;
     static int tempLowLimit;
     static int defaultTargetTemp;
+    static int defaultFanSpeed;
     static float feeRateH;
     static float feeRateM;
     static float feeRateL;
 
     Server(){
     }
-    Server(int mode, int tempHighLimit, int tempLowLimit,
-           int defaultTargetTemp, float feeRateH,
-           float feeRateM,
-           float feeRateL){
-        Server.mode = mode;
-        Server.tempHighLimit = tempHighLimit;
-        Server.tempLowLimit = tempLowLimit;
-        Server.defaultTargetTemp = defaultTargetTemp;
-        Server.feeRateH = feeRateH;
-        Server.feeRateM = feeRateM;
-        Server.feeRateL = feeRateL;
-    }
 
     void SetPara(int mode, int tempHighLimit, int tempLowLimit,
-                 int defaultTargetTemp, float feeRateH,
+                 int defaultTargetTemp, int defaultFanSpeed, float feeRateH,
                  float feeRateM,
                  float feeRateL){
         Server.mode = mode;
         Server.tempHighLimit = tempHighLimit;
         Server.tempLowLimit = tempLowLimit;
         Server.defaultTargetTemp = defaultTargetTemp;
+        Server.defaultFanSpeed = defaultFanSpeed;
         Server.feeRateH = feeRateH;
         Server.feeRateM = feeRateM;
         Server.feeRateL = feeRateL;
@@ -282,15 +272,16 @@ public class Server {
 	            preparedStatement = connection.prepareStatement(sql);
 	            resultSet = preparedStatement.executeQuery();
 	            while(resultSet.next()) {
-	            	String RoomId = resultSet.getString(1);
-	            	float TotalFee = resultSet.getFloat(2);
-	            	int NumberOfRDR = resultSet.getInt(3);
-	            	int TimesOfOnOff = resultSet.getInt(4);
-	            	int TimesOfDisPatch = resultSet.getInt(5);
-	            	int TimesOfChangeTemp = resultSet.getInt(6);
-	            	int TimesOfChangeFanSpeed = resultSet.getInt(7);
-	            	int Duration = resultSet.getInt(8);
-	            	Report Report = new Report(RoomId,TotalFee,NumberOfRDR,TimesOfOnOff,TimesOfDisPatch,TimesOfChangeTemp,TimesOfChangeFanSpeed,Duration);
+	                int ReportId = resultSet.getInt(1);
+	            	String RoomId = resultSet.getString(2);
+	            	float TotalFee = resultSet.getFloat(3);
+	            	int NumberOfRDR = resultSet.getInt(4);
+	            	int TimesOfOnOff = resultSet.getInt(5);
+	            	int TimesOfDisPatch = resultSet.getInt(6);
+	            	int TimesOfChangeTemp = resultSet.getInt(7);
+	            	int TimesOfChangeFanSpeed = resultSet.getInt(8);
+	            	int Duration = resultSet.getInt(9);
+	            	Report Report = new Report(ReportId,RoomId,TotalFee,NumberOfRDR,TimesOfOnOff,TimesOfDisPatch,TimesOfChangeTemp,TimesOfChangeFanSpeed,Duration);
 	            	listReport.add(Report);
 	            	System.out.println("roomId��"+RoomId);
 	            	System.out.println("TotalFee��"+TotalFee);

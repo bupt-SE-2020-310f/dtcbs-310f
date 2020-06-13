@@ -12,6 +12,16 @@ import java.util.List;
  */
 public class ServeClientQueue extends Queue {
 
+    @Override
+    public void Add(String roomId, Client client) {
+        if (roomId == null || client == null) {
+            return;
+        }
+        client.on = true;
+        this.roomInfo.put(roomId, client);
+        this.queueLength += 1;
+    }
+
     /**
      * Get the roomId of target room,
      * the room is binded with a client having the lowest priority and lower than level.
@@ -27,8 +37,8 @@ public class ServeClientQueue extends Queue {
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
             Client client = this.Get(roomId);
-            if (client.fanSpeed < low) {
-                low = client.fanSpeed;
+            if (client.on && client.priority < low) {
+                low = client.priority;
                 id = roomId;
             }
         }

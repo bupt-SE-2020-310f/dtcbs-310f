@@ -49,8 +49,9 @@ public class Dispatcher extends HttpServerSys {
 
     Dispatcher(){
         super();
-        core = new Server(0, 25, 18,
-                22, 1, (float) 0.5, (float) 1/3);
+        core = new Server();
+        core.SetPara(0, 25, 18,
+                22, 1, 1, (float) 0.5, (float) 1/3);
         sQueue = new ServeClientQueue();
         wQueue = new WaitClientQueue();
         sQueue.tother = wQueue;
@@ -85,7 +86,10 @@ public class Dispatcher extends HttpServerSys {
                 throw new MethodNotSupportedException(method + " method not supported");
             }
             String target = request.getRequestLine().getUri();
-            System.out.print(target + "\n");
+            //TODO
+            if (!target.contains("/fee")) {
+                System.out.print(target + "\n");
+            }
             String[] paths = target.split("/");
             response.setHeader("Access-Control-Allow-Origin","*");
             if (paths[1].equals("room") && paths[2] != null) {
@@ -104,26 +108,33 @@ public class Dispatcher extends HttpServerSys {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String id = values[0];
+                            String rmId = this.ctrl.roomId2id.get(id);
                             float currT = Float.parseFloat(values[1]);
-                            float changeT = Integer.parseInt(values[2]);
+                            float changeT = Float.parseFloat(values[2]);
                             float fee = 0;
+                            int targetT;
 
-                            int targetT = Server.defaultTargetTemp;
                             int rs = 2;//0 服务，1 等待，2 待机
-                            Client client = new Client();
-                            if (sQ().IsIn(id)) {
-                                client = sQ().Get(id);
+                            Client client = null;
+                            if (sQ().IsIn(rmId)) {
+                                client = sQ().Get(rmId);
                                 rs = 1;
-                            } else if (wQ().IsIn(id)) {
-                                client = wQ().Get(id);
+                            } else if (wQ().IsIn(rmId)) {
+                                client = wQ().Get(rmId);
                                 rs = 2;
                             }
-                            RoomState roomState = client.GetRoomState();
-                            fee = roomState.getFee();
-                            targetT = roomState.getTargetTemp();
-
-                            Update(id, targetT, currT);
-                            if (sQ().IsIn(id)) { rs = 0; } else if (wQ().IsIn(id)){ rs = 1; }
+                            fee = client.GetRoomState().getFee();
+                            targetT = client.targetTemp;
+                            Update(rmId, targetT, currT);
+                            if (sQ().IsIn(rmId)) {
+                                rs = 0;
+                            } else if (wQ().IsIn(rmId)) {
+                                if (wQ().Get(rmId).priority == -1) {
+                                    rs = 2;
+                                } else {
+                                    rs = 1;
+                                }
+                            }
 
                             jsonFee.put("status", 0);
                             jsonFee.put("msg", "成功");
@@ -133,7 +144,8 @@ public class Dispatcher extends HttpServerSys {
                             jsonFee.put("data", jsonData);
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonFee));
-                            System.out.println("Fee request Room:" + this.ctrl.roomId2id.get(id));
+                            //TODO
+//                            System.out.println("Fee request Room:" + this.ctrl.roomId2id.get(id));
                         }
                     }
                     else if (method.equals("PUT")) {
@@ -143,37 +155,39 @@ public class Dispatcher extends HttpServerSys {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String id = values[0];
+                            String rmId = this.ctrl.roomId2id.get(id);
 
-                            Update(id, 0, 0, 0);
-                            wQ().Get(id).on = false;
+
+                            Update(rmId, 0, 0, 0);
 
                             JSONObject jsonShutdown = new JSONObject();
                             jsonShutdown.put("status", 0);
                             jsonShutdown.put("msg", "成功");
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonShutdown));
-                            System.out.println("Shutdown Room: " + this.ctrl.roomId2id.get(id));
-                        } else if (type.equals("exit")) { // check out
+                            //TODO
+//                            System.out.println("Shutdown Room: " + this.ctrl.roomId2id.get(id));
+                        }
+                        else if (type.equals("exit")) { // check out
                             String[] values = new String[1];
                             for (int i = 0; i < args.length; i++) {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String id = values[0];
-
                             String rmId = this.ctrl.roomId2id.get(id);
 
                             this.ctrl.roomId2id.remove(id);
-                            if (sQ().IsIn(id)){
-                                Client c = sQ().Pop(id);
+                            if (sQ().IsIn(rmId)){
+                                Client c = sQ().Pop(rmId);
                                 //c.ShutDown();
-                                if ((id = wQ().HasHighestPriority()) != null){
+                                if ((rmId = wQ().HasHighestPriority()) != null){
                                     String idS = sQ().HasLowestPriority();
-                                    if (wQ().Get(id).priority > sQ().Get(idS).priority){
-                                        wQ().Exchange(idS, id);
+                                    if (idS != null && wQ().Get(rmId).priority > sQ().Get(idS).priority){
+                                        wQ().Exchange(idS, rmId);
                                     }
                                 }
-                            } else if (wQ().IsIn(id)){
-                                Client c = wQ().Pop(id);
+                            } else if (wQ().IsIn(rmId)){
+                                Client c = wQ().Pop(rmId);
                                 //c.ShutDown();
                             }
 
@@ -182,7 +196,8 @@ public class Dispatcher extends HttpServerSys {
                             jsonExit.put("msg", "成功");
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonExit));
-                            System.out.println("Check out Room: " + rmId);
+                            //TODO
+//                            System.out.println("Check out Room: " + rmId);
                         }
                     }
                     else {  //POST Request
@@ -195,9 +210,7 @@ public class Dispatcher extends HttpServerSys {
                             float currT = Float.parseFloat(values[1]);
                             int id = (int) (System.currentTimeMillis() - this.ctrl.calendar.getTime().getTime());
                             Client c = new Client(rmId, String.valueOf(id), currT);
-
-                            //TODO
-                            wQ().Add(String.valueOf(id), c);
+                            wQ().Add(rmId, c);
                             for (Iterator<HashMap.Entry<String, String>> it = this.ctrl.roomId2id.entrySet().iterator();
                                  it.hasNext();){
                                 HashMap.Entry<String, String> item = it.next();
@@ -223,66 +236,77 @@ public class Dispatcher extends HttpServerSys {
                             jsonCheckIn.put("data", jsonData);
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonCheckIn));
-                            System.out.println("Check in" + " Room " + values[0] + " id: " + id);
-                        } else if (type.equals("service")) {
+                            //TODO
+//                            System.out.println("Check in" + " Room " + values[0] + " id: " + id);
+                        }
+                        else if (type.equals("service")) {
                             String[] values = new String[4];
                             for (int i = 0; i < args.length; i++) {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String id = values[0];
+                            String rmId = this.ctrl.roomId2id.get(id);
                             int targetT = Integer.parseInt(values[1]);
                             int targetSpd = Integer.parseInt(values[2]);
                             float currT = Float.parseFloat(values[3]);
-                            Update(id, targetSpd, targetT, currT);
+                            Update(rmId, targetSpd, targetT, currT);
 
                             JSONObject jsonExit = new JSONObject();
                             jsonExit.put("status", 0);
                             jsonExit.put("msg", "成功");
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonExit));
-                            System.out.println("Boot" + " Room: " + id);
-                        } else if (type.equals("temp")) {
+                            //TODO
+//                            System.out.println("Boot" + " Room: " + id);
+                        }
+                        else if (type.equals("temp")) {
                             String[] values = new String[2];
                             for (int i = 0; i < args.length; i++) {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String id = values[0];
+                            String rmId = this.ctrl.roomId2id.get(id);
                             int targetT = Integer.parseInt(values[1]);
 
-                            Update(id, targetT);
+                            Update(rmId, targetT);
 
                             JSONObject jsonTemp = new JSONObject();
                             jsonTemp.put("status", 0);
                             jsonTemp.put("msg", "成功");
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonTemp));
-                            System.out.println("Adjust temperature Room: " + this.ctrl.roomId2id.get(id));
-                        } else if (type.equals("fan")) {
+                            //TODO
+//                            System.out.println("Adjust temperature Room: " + this.ctrl.roomId2id.get(id));
+                        }
+                        else if (type.equals("fan")) {
                             String[] values = new String[3];
                             for (int i = 0; i < args.length; i++) {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String id = values[0];
+                            String rmId = this.ctrl.roomId2id.get(id);
                             int speed = Integer.parseInt(values[1]);
                             int temp;
 
-                            if (wQ().IsIn(id)){
-                                temp = wQ().Get(id).targetTemp;
+                            if (wQ().IsIn(rmId)){
+                                temp = wQ().Get(rmId).targetTemp;
                             } else {
-                                temp = sQ().Get(id).targetTemp;
+                                temp = sQ().Get(rmId).targetTemp;
                             }
-                            Update(id, speed, temp);
+                            Update(rmId, speed, temp);
 
                             JSONObject jsonFan = new JSONObject();
                             jsonFan.put("status", 0);
                             jsonFan.put("msg", "成功");
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonFan));
-                            System.out.println("Adjust speed Room " + this.ctrl.roomId2id.get(id));
+                            //TODO
+//                            System.out.println("Adjust speed Room " + this.ctrl.roomId2id.get(id));
                         }
                     }
-                    System.out.print("\n");
+//                    System.out.print("\n");
                 } catch (NumberFormatException e){
+                    e.printStackTrace();
                     System.err.print("Wrong uri params from client: " + request.getRequestLine() + "\n");
                 }
 
@@ -305,6 +329,7 @@ public class Dispatcher extends HttpServerSys {
                 c = wQ().Get(id);
             }
             c.targetTemp = temp;
+            c.priority = c.fanSpeed;
         }
 
         // POST: fan
@@ -330,10 +355,9 @@ public class Dispatcher extends HttpServerSys {
             } else {
                 c = wQ().Get(id);
             }
-            if ((Server.mode == 0 && temp - currT < 1e-1 && sQ().IsIn(c.id))
-                    || (Server.mode == 1 && currT - temp < 1e-1 && sQ().IsIn(c.id)) ){
-                c.priority = 0;
-                c.state = 2;
+            if ((Server.mode == 0 && temp - currT < 1e-1 && currT - temp < 1 && sQ().IsIn(id))
+                    || (Server.mode == 1 && currT - temp < 1e-1 && temp - currT < 1 && sQ().IsIn(id))) {
+                c.priority = -1;
             }
             c.targetTemp = temp;
             c.currentTemp = currT;
@@ -344,26 +368,49 @@ public class Dispatcher extends HttpServerSys {
         private void Update(String id, int fanSpd, int temp, float currT){
             Client c;
             if (sQ().IsIn(id)){
-                c = sQ().Get(id);
+                if (temp != 0) {
+                    c = sQ().Get(id);
+                } else {
+                    c = sQ().Pop(id);
+                    wQ().Add(id, c);
+                }
             } else {
                 c = wQ().Get(id);
             }
-            if (temp == 0) {
-                if ((Server.mode == 0 && temp - currT < 1e-1 && sQ().IsIn(c.id))
-                        || (Server.mode == 1 && currT - temp < 1e-1 && sQ().IsIn(c.id)) ){
-                    c.priority = 0;
-                    c.state = 2;
+            if (temp != 0) {
+                if ((Server.mode == 0 && temp - currT < 1e-1 && temp - currT > -1 && sQ().IsIn(id))
+                        || (Server.mode == 1 && currT - temp < 1e-1 && temp - currT < 1 && sQ().IsIn(id))) {
+                    c.priority = -1;
+                } else {
+                    c.priority = fanSpd;
                 }
-
+                c.fanSpeed = fanSpd;
+                c.on = true;
+                c.targetTemp = temp;
+                c.currentTemp = currT;
+            } else {
+                c.priority = c.fanSpeed;
+                c.on = false;
+                if (c.timer != null) {
+                    c.timer.TimeCancel();
+                    c.timer = null;
+                }
             }
+            while (Dispatch());
         }
 
         private boolean Dispatch(){
             if(wQ().queueLength > 0){
                 String wId = wQ().HasHighestPriority();
+                if (wId == null) {
+                    return false;
+                }
                 String sId = sQ().HasLowerPriority(wQ().Get(wId).priority);
                 if (sId != null){
                     sQ().Exchange(sId, wId);
+                    return true;
+                } else if (sQ().queueLength < 3) {
+                    sQ().Add(wId, wQ().Pop(wId));
                     return true;
                 }
             }
@@ -373,7 +420,7 @@ public class Dispatcher extends HttpServerSys {
 
     public static void main(String[] args) throws Exception {
 
-        int port = 8080;
+        int port = 80;
         Dispatcher dispa = new Dispatcher();
 
         if (args.length >= 1) {
