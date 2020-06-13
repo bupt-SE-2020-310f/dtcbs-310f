@@ -1,10 +1,12 @@
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -15,7 +17,7 @@ import java.net.SocketException;
 import java.util.LinkedList;
 
 public class Room implements RoomConstant{
-    private String host = "http://localhost:8080";
+    private String host = "http://localhost:80";
     private final String checkInS = "/room/initial?roomId=**&currentTemperature=**";
     private final String bootS = "/room/service?id=**&targetTemperature=**&fanSpeed=**&currentTemperature=**";
     private final String shutdownS = "/room/service?id=**";
@@ -30,7 +32,8 @@ public class Room implements RoomConstant{
     double fee;
     int targetTemperature, tempH, tempL, defTemp, defFan;
     int fanSpeed;
-    int roomState, id;
+    int roomState;// 0 SERVED, 1 WAIT, 2 STANDBY
+    int id;
     int mode; // 0 HOT, 1 COLD
 
     double changeTemperature;
@@ -44,7 +47,7 @@ public class Room implements RoomConstant{
 
     String timeLinePath = "/timeline.txt";
 
-    public void checkIn(){
+    public void checkIn() {
         LinkedList<String> vals = new LinkedList<>();
         vals.add(String.valueOf(roomId));
         vals.add(String.valueOf(currentTemperature));
@@ -59,10 +62,12 @@ public class Room implements RoomConstant{
             tempL = j.getInteger("lowestTemperature");
             defFan = j.getInteger("defaultFanSpeed");
             defTemp = j.getInteger("defaultTargetTemperature");
+            targetTemperature = defTemp;
+            fanSpeed = j.getInteger("defaultFanSpeed");
         }
     }
 
-    public void boot(){
+    public void boot() {
         LinkedList<String> vals = new LinkedList<>();
         vals.add(String.valueOf(id));
         vals.add(String.valueOf(targetTemperature));
@@ -76,7 +81,7 @@ public class Room implements RoomConstant{
         JSONObject j = doPost(send, s);
     }
 
-    public void shutdown(){
+    public void shutdown() {
         LinkedList<String> vals = new LinkedList<>();
         vals.add(String.valueOf(id));
         String s = craftStr(shutdownS,vals);
@@ -84,7 +89,7 @@ public class Room implements RoomConstant{
         JSONObject j = doPut(send, s);
     }
 
-    public void cgTemp(){
+    public void cgTemp() {
         LinkedList<String> vals = new LinkedList<>();
         vals.add(String.valueOf(id));
         vals.add(String.valueOf(targetTemperature));
@@ -94,7 +99,7 @@ public class Room implements RoomConstant{
         JSONObject j = doPost(send, s);
     }
 
-    public void cgFan(){
+    public void cgFan() {
         LinkedList<String> vals = new LinkedList<>();
         vals.add(String.valueOf(id));
         vals.add(String.valueOf(fanSpeed));
@@ -104,7 +109,7 @@ public class Room implements RoomConstant{
         JSONObject j = doPost(send, s);
     }
 
-    public void fee(){
+    public void fee() {
         LinkedList<String> vals = new LinkedList<>();
         ifRecuperate();
         vals.add(String.valueOf(id));
@@ -124,7 +129,8 @@ public class Room implements RoomConstant{
         }
 
     }
-    public void checkOut(){
+
+    public void checkOut()  {
         LinkedList<String> vals = new LinkedList<>();
         vals.add(String.valueOf(id));
         String s = craftStr(checkOutS, vals);
@@ -136,20 +142,22 @@ public class Room implements RoomConstant{
         if (recuperateMode){
             if (mode == HOT) {
                 refrigerate(0.5);
-                if (targetTemperature - currentTemperature - 1 > tempDetectGranularity) {
+                if (targetTemperature - currentTemperature - 0.1 > tempDetectGranularity) {
                     recuperateMode = false;
+                    //cgTemp();
                 }
             } else if (mode == COLD) {
                 heat(0.5);
                 if (currentTemperature - targetTemperature - 1 > tempDetectGranularity) {
                     recuperateMode = false;
+                    cgTemp();
                 }
             }
-        } else {
+        } else if (roomState == SERVED) {
             double temperatureChangeRate;
             switch (fanSpeed){
                 case LOW:
-                    temperatureChangeRate = 0.3333;
+                    temperatureChangeRate = 0.3333333;
                     break;
                 case MID:
                     temperatureChangeRate = 0.5;
@@ -158,14 +166,20 @@ public class Room implements RoomConstant{
                     temperatureChangeRate = 1;
                     break;
                 default:
-                    temperatureChangeRate = 0;
+                    temperatureChangeRate = 0.5;
             }
             if (mode == HOT) {
                 heat(temperatureChangeRate);
             } else if (mode == COLD) {
                 refrigerate(temperatureChangeRate);
             }
+        } else if (roomState == STANDBY) {
+            recuperateMode = true;
+            lastTimePoint = System.currentTimeMillis();
+        } else {
+            lastTimePoint = System.currentTimeMillis();
         }
+
     }
 
     private void heat(double tempRate) {
@@ -184,93 +198,98 @@ public class Room implements RoomConstant{
         currentTemperature += changeTemperature;
     }
 
-    private JSONObject doPost(JSONObject jsonObject, String s){
-        CloseableHttpClient client;
-        CloseableHttpResponse response;
+    private JSONObject doPost(JSONObject jsonObject, String s) {
+        CloseableHttpClient client = HttpClients.createDefault();;
+        CloseableHttpResponse response = null;
         try {
-            client = HttpClients.createDefault();
             HttpPost post = new HttpPost(host + s);
             StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8");
             post.setEntity(entity);
-            post.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            post.addHeader("Content-Type", "application/json; charset=utf-8");
             post.addHeader("Accept", "text/plain;charset=utf-8");
             System.out.print("Try to POST: " + host + s + "\n");
             response = client.execute(post);
-            client.close();
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (200 == statusCode) {
                 String result = EntityUtils.toString(response.getEntity(),"UTF-8");
                 System.out.print(result);
                 System.out.print("\n");
+                client.close();
                 return JSONObject.parseObject(result);
             }
-
+            client.close();
         } catch (ClientProtocolException e) {
             System.err.print("Connection failed.\n");
         } catch (SocketException e) {
+            e.printStackTrace();
             System.err.print("Connection closed.\n");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+
         }
         return null;
     }
 
-    private JSONObject doGet(JSONObject jsonObject, String s){
-        CloseableHttpClient client;
-        CloseableHttpResponse response;
+    private JSONObject doGet(JSONObject jsonObject, String s) {
+        CloseableHttpClient client = HttpClients.createDefault();;
+        CloseableHttpResponse response = null;
+
         try {
-            client = HttpClients.createDefault();
-            HttpGet get = new HttpGet(host + s);
-            get.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
-            get.addHeader("Accept", "text/plain;charset=utf-8");
+            HttpGetWithEntity get = new HttpGetWithEntity(host + s);
+            HttpEntity getE = new StringEntity(jsonObject.toString(), ContentType.APPLICATION_JSON);
+            get.setEntity(getE);
+            get.addHeader("Content-Type", "application/json; charset=utf-8");
             System.out.print("Try to GET: " + host + s + "\n");
             response = client.execute(get);
-            client.close();
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (200 == statusCode) {
                 String result = EntityUtils.toString(response.getEntity(),"UTF-8");
                 System.out.print(result);
                 System.out.print("\n");
+                client.close();
                 return JSONObject.parseObject(result);
             }
-
+            client.close();
         } catch (ClientProtocolException e) {
             System.err.print("Connection failed.\n");
         } catch (SocketException e) {
             System.err.print("Connection closed.\n");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+
         }
         return null;
     }
 
-    private JSONObject doPut(JSONObject jsonObject, String s){
-        CloseableHttpClient client;
-        CloseableHttpResponse response;
+    private JSONObject doPut(JSONObject jsonObject, String s) {
+        CloseableHttpClient client = HttpClients.createDefault();;
+        CloseableHttpResponse response = null;
         try {
-            client = HttpClients.createDefault();
             HttpPut put = new HttpPut(host + s);
             StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8");
             put.setEntity(entity);
-            put.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            put.addHeader("Content-Type", "application/json; charset=utf-8");
             put.addHeader("Accept", "text/plain;charset=utf-8");
             System.out.print("Try to PUT: " + host + s + "\n");
             response = client.execute(put);
-            client.close();
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (200 == statusCode) {
                 String result = EntityUtils.toString(response.getEntity(),"UTF-8");
                 System.out.print(result);
                 System.out.print("\n");
+                client.close();
                 return JSONObject.parseObject(result);
             }
-
+            client.close();
         } catch (ClientProtocolException e) {
             System.err.print("Connection failed.\n");
         } catch (SocketException e) {
+            e.printStackTrace();
             System.err.print("Connection closed.\n");
         } catch (IOException e) {
             e.printStackTrace();

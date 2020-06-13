@@ -35,23 +35,26 @@ public class ClientUI {
         changeFan.setEnabled(false);
         changeTemp.setEnabled(false);
         checkOut.setEnabled(false);
+        screenTimer = new Timer();
 
-
-        feeUpdate = new FeeUpdateTsk(room);
         screenRefresh = new ScreenUpdateTsk(this);
+        screenTimer.schedule(screenRefresh, 0, refreshDelay);
 
         checkIn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 room.roomId = Long.parseLong(roomId.getText());
                 roomId.setEditable(false);
-                room.currentTemperature = Float.parseFloat(currTemp.getText());
+                room.currentTemperature = Float.parseFloat(initTemp.getText());
                 room.checkIn();
                 id.setText(String.valueOf(room.id));
                 targetTemp.setText(String.valueOf(room.defTemp));
+                fan.setSelectedIndex(room.fanSpeed);
                 checkOut.setEnabled(true);
                 checkIn.setEnabled(false);
                 powerOn.setEnabled(true);
+                changeFan.setEnabled(true);
+                changeTemp.setEnabled(true);
             }
         });
 
@@ -65,8 +68,10 @@ public class ClientUI {
                 powerOff.setEnabled(false);
                 powerOn.setEnabled(false);
                 roomId.setEditable(true);
-                feeTimer.cancel();
-                screenTimer.cancel();
+                changeFan.setEnabled(false);
+                changeTemp.setEnabled(false);
+                //feeTimer.cancel();
+                //screenTimer.cancel();
             }
         });
 
@@ -74,13 +79,12 @@ public class ClientUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 room.boot();
-                room.lastTimePoint = System.currentTimeMillis();
                 powerOn.setEnabled(false);
                 powerOff.setEnabled(true);
                 feeTimer = new Timer();
-                screenTimer = new Timer();
-                feeTimer.schedule(feeUpdate, updateDelay);
-                screenTimer.schedule(screenRefresh, refreshDelay);
+                room.lastTimePoint = System.currentTimeMillis();
+                feeUpdate = new FeeUpdateTsk(room);
+                feeTimer.schedule(feeUpdate, 1000, updateDelay);
             }
         });
 
@@ -89,9 +93,11 @@ public class ClientUI {
             public void actionPerformed(ActionEvent e) {
                 powerOn.setEnabled(true);
                 powerOff.setEnabled(false);
+                changeTemp.setEnabled(false);
+                changeFan.setEnabled(false);
+                room.currentTemperature = Double.parseDouble(currTemp.getText());
                 room.shutdown();
                 feeTimer.cancel();
-                screenTimer.cancel();
             }
         });
 

@@ -28,8 +28,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -44,7 +44,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ClientUI/lib" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/jna-platform-4.5.2.jar!/" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -98,8 +98,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.ClientUI (1)" />
-        <item itemvalue="Application.ClientUI" />
         <item itemvalue="Application.Dispatcher" />
+        <item itemvalue="Application.ClientUI" />
         <item itemvalue="Application.Room (1)" />
         <item itemvalue="Application.ui" />
       </list>
@@ -155,50 +155,50 @@
       <screen x="0" y="30" width="1536" height="834" />
     </state>
     <state x="498" y="236" key="#com.intellij.ide.util.TreeClassChooserDialog/0.30.1536.834@0.30.1536.834" timestamp="1591256506552" />
-    <state x="402" y="222" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1591979234169">
+    <state x="402" y="222" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1592018774520">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state x="402" y="222" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/0.30.1536.834@0.30.1536.834" timestamp="1591979234169" />
-    <state x="549" y="202" key="FileChooserDialogImpl" timestamp="1592003860509">
+    <state x="402" y="222" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/0.30.1536.834@0.30.1536.834" timestamp="1592018774520" />
+    <state x="549" y="202" key="FileChooserDialogImpl" timestamp="1592018720710">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state x="549" y="202" key="FileChooserDialogImpl/0.30.1536.834@0.30.1536.834" timestamp="1592003860509" />
-    <state width="1493" height="171" key="GridCell.Tab.0.bottom" timestamp="1592008457354">
+    <state x="549" y="202" key="FileChooserDialogImpl/0.30.1536.834@0.30.1536.834" timestamp="1592018720710" />
+    <state width="1493" height="127" key="GridCell.Tab.0.bottom" timestamp="1592027172868">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="171" key="GridCell.Tab.0.bottom/0.30.1536.834@0.30.1536.834" timestamp="1592008457354" />
-    <state width="1493" height="171" key="GridCell.Tab.0.center" timestamp="1592008457354">
+    <state width="1493" height="127" key="GridCell.Tab.0.bottom/0.30.1536.834@0.30.1536.834" timestamp="1592027172868" />
+    <state width="1493" height="127" key="GridCell.Tab.0.center" timestamp="1592027172868">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="171" key="GridCell.Tab.0.center/0.30.1536.834@0.30.1536.834" timestamp="1592008457354" />
-    <state width="1493" height="171" key="GridCell.Tab.0.left" timestamp="1592008457354">
+    <state width="1493" height="127" key="GridCell.Tab.0.center/0.30.1536.834@0.30.1536.834" timestamp="1592027172868" />
+    <state width="1493" height="127" key="GridCell.Tab.0.left" timestamp="1592027172868">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="171" key="GridCell.Tab.0.left/0.30.1536.834@0.30.1536.834" timestamp="1592008457354" />
-    <state width="1493" height="171" key="GridCell.Tab.0.right" timestamp="1592008457354">
+    <state width="1493" height="127" key="GridCell.Tab.0.left/0.30.1536.834@0.30.1536.834" timestamp="1592027172868" />
+    <state width="1493" height="127" key="GridCell.Tab.0.right" timestamp="1592027172868">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="171" key="GridCell.Tab.0.right/0.30.1536.834@0.30.1536.834" timestamp="1592008457354" />
-    <state width="1493" height="222" key="GridCell.Tab.1.bottom" timestamp="1591985289677">
+    <state width="1493" height="127" key="GridCell.Tab.0.right/0.30.1536.834@0.30.1536.834" timestamp="1592027172868" />
+    <state width="1493" height="222" key="GridCell.Tab.1.bottom" timestamp="1592021911317">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="222" key="GridCell.Tab.1.bottom/0.30.1536.834@0.30.1536.834" timestamp="1591985289677" />
-    <state width="1493" height="222" key="GridCell.Tab.1.center" timestamp="1591985289677">
+    <state width="1493" height="222" key="GridCell.Tab.1.bottom/0.30.1536.834@0.30.1536.834" timestamp="1592021911317" />
+    <state width="1493" height="222" key="GridCell.Tab.1.center" timestamp="1592021911317">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="222" key="GridCell.Tab.1.center/0.30.1536.834@0.30.1536.834" timestamp="1591985289677" />
-    <state width="1493" height="222" key="GridCell.Tab.1.left" timestamp="1591985289677">
+    <state width="1493" height="222" key="GridCell.Tab.1.center/0.30.1536.834@0.30.1536.834" timestamp="1592021911317" />
+    <state width="1493" height="222" key="GridCell.Tab.1.left" timestamp="1592021911317">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="222" key="GridCell.Tab.1.left/0.30.1536.834@0.30.1536.834" timestamp="1591985289677" />
-    <state width="1493" height="222" key="GridCell.Tab.1.right" timestamp="1591985289677">
+    <state width="1493" height="222" key="GridCell.Tab.1.left/0.30.1536.834@0.30.1536.834" timestamp="1592021911317" />
+    <state width="1493" height="222" key="GridCell.Tab.1.right" timestamp="1592021911317">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state width="1493" height="222" key="GridCell.Tab.1.right/0.30.1536.834@0.30.1536.834" timestamp="1591985289677" />
-    <state x="226" y="30" key="SettingsEditor" timestamp="1591418630597">
+    <state width="1493" height="222" key="GridCell.Tab.1.right/0.30.1536.834@0.30.1536.834" timestamp="1592021911317" />
+    <state x="226" y="30" key="SettingsEditor" timestamp="1592018777244">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state x="226" y="30" key="SettingsEditor/0.30.1536.834@0.30.1536.834" timestamp="1591418630597" />
+    <state x="226" y="30" key="SettingsEditor/0.30.1536.834@0.30.1536.834" timestamp="1592018777244" />
     <state x="638" y="241" key="UIDesigner.ListEditorDialog" timestamp="1592005796878">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
@@ -207,10 +207,10 @@
       <screen x="0" y="30" width="1536" height="834" />
     </state>
     <state x="0" y="30" width="600" height="834" key="find.popup/0.30.1536.834@0.30.1536.834" timestamp="1591420334672" />
-    <state x="102" y="65" width="1198" height="679" key="new project wizard" timestamp="1591977346271">
+    <state x="102" y="65" width="1198" height="679" key="new project wizard" timestamp="1592018051459">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
-    <state x="102" y="65" width="1198" height="679" key="new project wizard/0.30.1536.834@0.30.1536.834" timestamp="1591977346271" />
+    <state x="102" y="65" width="1198" height="679" key="new project wizard/0.30.1536.834@0.30.1536.834" timestamp="1592018051459" />
     <state x="548" y="192" key="refactoring.ChangeSignatureDialog" timestamp="1591976295479">
       <screen x="0" y="30" width="1536" height="834" />
     </state>
@@ -234,6 +234,11 @@
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ClientUI/src/Room.java</url>
+          <line>189</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
