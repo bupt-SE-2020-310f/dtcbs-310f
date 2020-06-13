@@ -41,19 +41,7 @@ public class Queue {
      * Bind the room associated with roomId with a client,
      * and add the client to self.roomInfo.
      * Self.queueLength plus 1.
-     *  @param roomId identifier of room
-     * @param speed target fan speed
-     * @param temp target temperature
-     * @param curTemp current temperature
      */
-    public void Add(String roomId, int speed, int temp, float curTemp) {
-        if (roomId == null) {
-            return;
-        }
-        this.roomInfo.put(roomId, new Client(speed, temp, curTemp));
-        this.queueLength += 1;
-    }
-
     public void Add(String roomId, Client client) {
         if (roomId == null || client == null) {
             return;
@@ -180,8 +168,8 @@ public class Queue {
     }
 
     /**
-     * Change target fan speed of target room.
-     * Put the client into tail of queue.
+     * Change target fanSpeed  as well as feeRate of target room.
+     * Put the client into tail of queue and make a record.
      *
      * @param roomId identifier of room
      * @param speed target fan speed
@@ -189,8 +177,8 @@ public class Queue {
     public void ChangeSpeed(String roomId, int speed) {
         if (IsIn(roomId)) {
             Client client = this.Pop(roomId);
-            client.fanSpeed = speed;
             this.Add(roomId, client);
+            client.Enable(Server.mode, speed); // change fanSpeed and feeRate, and insert a record
         }
     }
 
@@ -228,7 +216,7 @@ public class Queue {
             this.Exchange(roomId, roomId2);
             for (String id : this.roomInfo.keySet()) {
                 Client client = this.Get(id);
-                if (client.timer != null && client.timer.waitTime < waitTime/2) {
+                if (client.timer != null && client.timer.waitTime < 3000) {
                     client.timer.TimeCancel();
                     client.timer = null;
                 }

@@ -1,13 +1,6 @@
 
 import struct.RoomState;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,55 +18,35 @@ public class Client {
 	float fee;
 	float feeRate;
 	int duration;
-	Timer timer = null;
-    int priority;   // smaller value has lower priority
-    int fanSpeed; // also as priority: 0,1,2, smaller value has lower fanSpeed/priority
-    int targetTemp;
-    float currentTemp;
-    Timer timer = null;
-
-
+	int priority;
+	int fanSpeed;
+	int targetTemp;
+	float currentTemp;
+	float preTemp;
+	long startTime;
+	long currentTime;
+	long preTime;
+	int state; // 0-serve, 1-wait, 2-standby
 	DetailForm detailForm;
+	Timer timer;
+
+	Client() {
+
+	}
 
 	Client(String rmId, String id, float currTmep){
-		this.rmId = rmId;
 		this.id = id;
-		this.currentTemp = currTmep;
-		this.priority = 0;
+		this.rmId = rmId;
 		this.fee = 0;
+		this.priority = 0;
+		this.currentTemp = currTmep;
+		this.duration = 0;
+		this.startTime = System.currentTimeMillis();
+		this.currentTime = startTime;
+		this.timer = null;
 	}
 
-	Client(int fanSpeed, int targetTemp, float currentTemp) {
-        this.fanSpeed = fanSpeed;
-        this.targetTemp = targetTemp;
-        this.currentTemp = currentTemp;
-    }
-
-	public boolean Enable(int roomId, int mode, int speed, int tgTemp, String requestTime, int requestDuration) throws InterruptedException {
-		this.on = true;
-		this.fanSpeed = speed;
-		this.duration = requestDuration;
-		//变温程序
-		try {
-			if (mode == 1) {//制热模式
-				this.currentTemp = 16;
-				this.targetTemp = tgTemp;
-				while (currentTemp != targetTemp) {
-					Thread.sleep(60000);
-					//模拟升温每60s升0.5度
-					currentTemp += 0.5;
-				}
-
-				this.priority = 1;  // default = 1
-				this.fee = 0;
-			}
-		} finally {
-
-		}
-		return true;
-	}
-
-	public boolean Enable(String roomId, int mode, int speed) {
+	public void Enable(int mode, int speed) {
 		Date date = new Date();
 		SimpleDateFormat startTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		float changeTemp;
@@ -111,25 +84,40 @@ public class Client {
 				feeRate = electricQuantity * 1;
 			}
 		}
-		this.fee += this.feeRate;
-		this.Record(roomId,startTime.format(date),speed,feeRate);
-		return true;
+		fanSpeed = speed;
+		this.Record(rmId,startTime.format(date),speed,feeRate);
 	}
-	
-/*	public Client GetRoomState() {
-		Client RoomState = new Client();
-		return RoomState;
-	}*/
 
 
 	/**
-     * Get information of the room associated with client.
-     *
-     * @return the information
-     */
-    public RoomState GetRoomState() {
-        return null;
-    }
+	 * Get information of the room associated with client.
+	 *
+	 * @return this
+	 */
+	public RoomState GetRoomState() {
+		preTemp = currentTemp;
+		preTime = currentTime;
+		currentTime = System.currentTimeMillis();
+		if (state >= 1  && Math.abs(currentTemp-targetTemp) < 1) { // recover limit: 1
+			if (Server.mode == 0 && currentTemp >= targetTemp) { // heat
+				currentTemp -= 0.5 * (float)(currentTime-preTime)/60000;
+			} else if (Server.mode == 1 && currentTemp <= targetTemp) { // cool
+				currentTemp += 0.5 * (float)(currentTime-preTime)/60000;
+			}
+		} else if (state == 0){ // serve
+			if (Server.mode == 0 && currentTemp < targetTemp) { // heat
+				currentTemp += ((float)(currentTime-preTime)/60000) / fanSpeed;
+			} else if (Server.mode == 1 && currentTemp > targetTemp) { // cool
+				currentTemp -= ((float)(currentTime-preTime)/60000) / fanSpeed;;
+			}
+		}
+		duration += currentTemp - startTime;
+		if (timer != null) {
+			timer.waitTime -= currentTime - preTime;
+		}
+		fee += feeRate * Math.abs(currentTemp - preTemp);
+		return new RoomState(on, id, rmId, fee, feeRate, duration, fanSpeed, targetTemp, currentTemp);
+	}
 
 	public void Record(String roomId, String startTime, int fanSpeed, float feeRate) {
 		this.detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);

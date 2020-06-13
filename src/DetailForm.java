@@ -113,13 +113,14 @@ public class DetailForm {
             	String RequestTime = resultSet.getString(2);
             	String TerminationTime = resultSet.getString(3);
             	int FanSpeed = resultSet.getInt(4);
-            	float FeeRate = resultSet.getInt(5);
+            	float FeeRate = resultSet.getFloat(5);
+            	float Fee = resultSet.getFloat(6);
             	
                 long NTime =df.parse(RequestTime).getTime();
                 long OTime = df.parse(TerminationTime).getTime();
                 long RequestDuration=(NTime-OTime)/1000;
             	
-                RDR RDR= new RDR(RoomId, RequestTime, RequestDuration, FanSpeed, FeeRate);
+                RDR RDR= new RDR(RoomId, RequestTime, RequestDuration, FanSpeed, FeeRate, Fee);
                 listRDR.add(RDR);
                 System.out.println("roomId："+RoomId);
                 System.out.println("RequestTime："+RequestTime);
