@@ -19,20 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d0d6f2f0-b5f3-4cbf-96d0-00de2c13a819" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Database.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Dispatcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Dispatcher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Queue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Queue.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ServeClientQueue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServeClientQueue.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TestClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WaitClientQueue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WaitClientQueue.java" afterDir="false" />
-    </list>
+    <list default="true" id="d0d6f2f0-b5f3-4cbf-96d0-00de2c13a819" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -130,6 +117,7 @@
       <updated>1591250113825</updated>
       <workItem from="1592052764957" duration="15371000" />
       <workItem from="1592068728316" duration="10309000" />
+      <workItem from="1592079290787" duration="207000" />
     </task>
     <servers />
   </component>
