@@ -84,6 +84,7 @@ public class ClientUI implements RoomConstants {
                 initTemp.setEditable(true);
                 hotMode.setEnabled(true);
                 coldMode.setEnabled(true);
+
                 room.roomState = SHUTDOWN;
                 //feeTimer.cancel();
                 //screenTimer.cancel();
@@ -100,6 +101,7 @@ public class ClientUI implements RoomConstants {
                 powerOff.setEnabled(true);
                 changeTemp.setEnabled(true);
                 changeFan.setEnabled(true);
+                checkOut.setEnabled(false);
                 feeTimer = new Timer();
                 room.lastTimePoint = System.currentTimeMillis();
                 feeUpdate = new FeeUpdateTsk(room);
@@ -114,6 +116,7 @@ public class ClientUI implements RoomConstants {
                 powerOff.setEnabled(false);
                 changeTemp.setEnabled(false);
                 changeFan.setEnabled(false);
+                checkOut.setEnabled(true);
                 room.currentTemperature = Double.parseDouble(currTemp.getText());
                 room.shutdown();
                 feeTimer.cancel();
@@ -152,16 +155,6 @@ public class ClientUI implements RoomConstants {
                 room.mode = COLD;
             }
         });
-    }
-
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("ClientUI");
-        Room room = new Room();
-        frame.setContentPane(new ClientUI(room).panel1);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
     }
 
     public void refresh() {
@@ -206,4 +199,14 @@ public class ClientUI implements RoomConstants {
             ui.refresh();
         }
     }
+
+    public static void main(String[] args) {
+        Room room = new Room();
+        JFrame frame = new JFrame("ClientUI");
+        frame.setContentPane(new ClientUI(room).panel1);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
 }
