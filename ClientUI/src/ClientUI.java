@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.desktop.SystemEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -73,6 +74,7 @@ public class ClientUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 room.boot();
+                room.lastTimePoint = System.currentTimeMillis();
                 powerOn.setEnabled(false);
                 powerOff.setEnabled(true);
                 feeTimer = new Timer();
