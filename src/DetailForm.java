@@ -15,21 +15,33 @@ import struct.RDR;
 public class DetailForm {
 	Database db = new Database();
 	
-	public boolean InsertRecord(String roomId, String startTime, int fanSpeed, float feeRate) {	
+	public boolean InsertRecord(String roomId, String startTime, int fanSpeed, float feeRate) {
+		System.out.println(roomId);
+		System.out.println(startTime);
+		System.out.println(fanSpeed);
+		System.out.println(feeRate);
+		
 		Connection conn=null;
-		Statement st=null;
+		PreparedStatement st = null;
 		try {
 			Class.forName(db.driverName);
 			conn=DriverManager.getConnection(db.url, db.user, db.password);
+			System.out.println("Connection Successful!");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		try {
-			st=conn.createStatement();
-			String sql="insert into Record(RoomId,StartTime,FanSpeed,FeeRate) values(roomId, startTime, fanSpeed, feeRate)";
-			int result=st.executeUpdate(sql);
+			
+			System.out.println("Connection Successful!");
+			String sql="insert into Record(RoomId,StartTime,FanSpeed,FeeRate) values(?, ?, ?, ?)";
+			st=conn.prepareStatement(sql);
+			st.setString(1, roomId);
+			st.setString(2, startTime);
+			st.setInt(3, fanSpeed);
+			st.setFloat(4, feeRate);
+			int result=st.executeUpdate();
 			if(result > 0) {
 				return true;
 			}
