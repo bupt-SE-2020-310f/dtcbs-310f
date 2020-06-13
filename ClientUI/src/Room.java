@@ -3,7 +3,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
@@ -16,8 +15,16 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.LinkedList;
 
-public class Room implements RoomConstant{
-    private String host = "http://localhost:80";
+/**
+ * A class for client to handles logic works and communicates with the server.
+ * Using apache HTTP client.
+ *
+ * @author Ziheng Ni, twist@bupt.edu.cn
+ * @since 12 June, 2020
+ */
+
+public class Room implements RoomConstants {
+    private final String host = "http://localhost:80";
     private final String checkInS = "/room/initial?roomId=**&currentTemperature=**";
     private final String bootS = "/room/service?id=**&targetTemperature=**&fanSpeed=**&currentTemperature=**";
     private final String shutdownS = "/room/service?id=**";
@@ -32,7 +39,7 @@ public class Room implements RoomConstant{
     double fee;
     int targetTemperature, tempH, tempL, defTemp, defFan;
     int fanSpeed;
-    int roomState;// 0 SERVED, 1 WAIT, 2 STANDBY
+    int roomState = SHUTDOWN;// 0 SERVED, 1 WAIT, 2 STANDBY
     int id;
     int mode; // 0 HOT, 1 COLD
 
@@ -142,9 +149,9 @@ public class Room implements RoomConstant{
         if (recuperateMode){
             if (mode == HOT) {
                 refrigerate(0.5);
-                if (targetTemperature - currentTemperature - 0.1 > tempDetectGranularity) {
+                if (targetTemperature - currentTemperature - 1 > tempDetectGranularity) {
                     recuperateMode = false;
-                    //cgTemp();
+                    cgTemp();
                 }
             } else if (mode == COLD) {
                 heat(0.5);

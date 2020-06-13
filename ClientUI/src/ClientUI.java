@@ -1,12 +1,19 @@
 import javax.swing.*;
-import java.awt.desktop.SystemEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ClientUI {
+/**
+ * This class implements GUI for clients.
+ * Using a instance of Room to handle logical and communicative works.
+ *
+ * @author Ziheng Ni, twist@bupt.edu.cn
+ * @since 12 June, 2020
+ */
+
+public class ClientUI implements RoomConstants {
     private JButton powerOn;
     private JPanel panel1;
     private JTextField roomId;
@@ -16,16 +23,18 @@ public class ClientUI {
     private JComboBox fan;
     private JButton powerOff;
     private JLabel id;
-    private JLabel mode;
     private JLabel currTemp;
     private JLabel fee;
     private JTextField initTemp;
     private JButton checkOut;
     private JButton checkIn;
+    private JCheckBox hotMode;
+    private JCheckBox coldMode;
+    private JLabel state;
     private Room room;
     private java.util.Timer feeTimer, screenTimer;
     private long updateDelay = 1500;
-    private long refreshDelay = 3000;
+    private long refreshDelay = 500;
     private TimerTask feeUpdate, screenRefresh;
 
     public ClientUI(Room rm){
@@ -36,6 +45,7 @@ public class ClientUI {
         changeTemp.setEnabled(false);
         checkOut.setEnabled(false);
         screenTimer = new Timer();
+        hotMode.setSelected(true);
 
         screenRefresh = new ScreenUpdateTsk(this);
         screenTimer.schedule(screenRefresh, 0, refreshDelay);
@@ -45,6 +55,7 @@ public class ClientUI {
             public void actionPerformed(ActionEvent e) {
                 room.roomId = Long.parseLong(roomId.getText());
                 roomId.setEditable(false);
+                initTemp.setEditable(false);
                 room.currentTemperature = Float.parseFloat(initTemp.getText());
                 room.checkIn();
                 id.setText(String.valueOf(room.id));
@@ -53,8 +64,8 @@ public class ClientUI {
                 checkOut.setEnabled(true);
                 checkIn.setEnabled(false);
                 powerOn.setEnabled(true);
-                changeFan.setEnabled(true);
-                changeTemp.setEnabled(true);
+                hotMode.setEnabled(false);
+                coldMode.setEnabled(false);
             }
         });
 
@@ -70,6 +81,10 @@ public class ClientUI {
                 roomId.setEditable(true);
                 changeFan.setEnabled(false);
                 changeTemp.setEnabled(false);
+                initTemp.setEditable(true);
+                hotMode.setEnabled(true);
+                coldMode.setEnabled(true);
+                room.roomState = SHUTDOWN;
                 //feeTimer.cancel();
                 //screenTimer.cancel();
             }
@@ -78,9 +93,13 @@ public class ClientUI {
         powerOn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                room.currentTemperature = Double.parseDouble(initTemp.getText());
+                currTemp.setText(initTemp.getText());
                 room.boot();
                 powerOn.setEnabled(false);
                 powerOff.setEnabled(true);
+                changeTemp.setEnabled(true);
+                changeFan.setEnabled(true);
                 feeTimer = new Timer();
                 room.lastTimePoint = System.currentTimeMillis();
                 feeUpdate = new FeeUpdateTsk(room);
@@ -98,6 +117,7 @@ public class ClientUI {
                 room.currentTemperature = Double.parseDouble(currTemp.getText());
                 room.shutdown();
                 feeTimer.cancel();
+                room.roomState = SHUTDOWN;
             }
         });
 
@@ -116,6 +136,22 @@ public class ClientUI {
                 room.cgFan();
             }
         });
+
+        hotMode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                coldMode.setSelected(false);
+                room.mode = HOT;
+            }
+        });
+
+        coldMode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                hotMode.setSelected(false);
+                room.mode = COLD;
+            }
+        });
     }
 
 
@@ -129,6 +165,13 @@ public class ClientUI {
     }
 
     public void refresh() {
+        String[] stateStr = { "-", "Waiting", "Recuperating", "Shutdown"};
+        if (SERVED != room.roomState){
+            state.setText(stateStr[room.roomState]);
+        } else {
+            String[] servedStr = { "Heating", "Refrigerating"};
+            state.setText(servedStr[room.mode]);
+        }
         currTemp.setText(String.valueOf(room.currentTemperature));
         fee.setText(String.valueOf(room.fee));
     }

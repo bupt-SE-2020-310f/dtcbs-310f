@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Main-Class: ClientUI
+Class-Path: libs/fastjson-1.2.70.jar libs/commons-codec-1.11.jar libs/co
+ mmons-logging-1.2.jar libs/fluent-hc-4.5.12.jar libs/httpclient-4.5.12.
+ jar libs/httpclient-cache-4.5.12.jar libs/httpclient-osgi-4.5.12.jar li
+ bs/httpclient-win-4.5.12.jar libs/httpcore-4.4.13.jar libs/httpmime-4.5
+ .12.jar libs/jna-4.5.2.jar libs/jna-platform-4.5.2.jar
+
