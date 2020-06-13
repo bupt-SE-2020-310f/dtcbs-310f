@@ -12,14 +12,15 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
+
 public class Server {
-    int mode;
-    int tempHighLimit;
-    int tempLowLimit;
-    int defaultTargetTemp;
-    float feeRateH;
-    float feeRateM;
-    float feeRateL;
+    static int mode; // 0-heat, 1-cool
+    static int tempHighLimit;
+    static int tempLowLimit;
+    static int defaultTargetTemp;
+    static float feeRateH;
+    static float feeRateM;
+    static float feeRateL;
 
     Server(){
     }
@@ -27,31 +28,177 @@ public class Server {
            int defaultTargetTemp, float feeRateH,
            float feeRateM,
            float feeRateL){
-        this.mode = mode;
-        this.tempHighLimit = tempHighLimit;
-        this.tempLowLimit = tempLowLimit;
-        this.defaultTargetTemp = defaultTargetTemp;
-        this.feeRateH = feeRateH;
-        this.feeRateM = feeRateM;
-        this.feeRateL = feeRateL;
+        Server.mode = mode;
+        Server.tempHighLimit = tempHighLimit;
+        Server.tempLowLimit = tempLowLimit;
+        Server.defaultTargetTemp = defaultTargetTemp;
+        Server.feeRateH = feeRateH;
+        Server.feeRateM = feeRateM;
+        Server.feeRateL = feeRateL;
     }
 
     void SetPara(int mode, int tempHighLimit, int tempLowLimit,
-                  int defaultTargetTemp, float feeRateH,
-                  float feeRateM,
-                  float feeRateL){
-        this.mode = mode;
-        this.tempHighLimit = tempHighLimit;
-        this.tempLowLimit = tempLowLimit;
-        this.defaultTargetTemp = defaultTargetTemp;
-        this.feeRateH = feeRateH;
-        this.feeRateM = feeRateM;
-        this.feeRateL = feeRateL;
+                 int defaultTargetTemp, float feeRateH,
+                 float feeRateM,
+                 float feeRateL){
+        Server.mode = mode;
+        Server.tempHighLimit = tempHighLimit;
+        Server.tempLowLimit = tempLowLimit;
+        Server.defaultTargetTemp = defaultTargetTemp;
+        Server.feeRateH = feeRateH;
+        Server.feeRateM = feeRateM;
+        Server.feeRateL = feeRateL;
+    }
+
+    public boolean PrintReport(int roomId, String dateIn, String dateOut) {
+        List<Report> listReport = new ArrayList<Report>();
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            String driverClass = "com.mysql.jdbc.Driver";
+            String url = "jdbc:mysql:///mydb";
+            String user = "root";
+            String pass= "1234";
+
+            Class.forName(driverClass);
+            connection = DriverManager.getConnection(url, user, pass);
+
+            String sql = "SELECT * FROM Report where id=roomId";
+            preparedStatement = connection.prepareStatement(sql);
+
+            resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                int ReportId = resultSet.getInt(1);
+                String RoomId = resultSet.getString(2);
+                float TotalFee = resultSet.getFloat(3);
+                int NumberofRDR = resultSet.getInt(4);
+                int TimesofOnOff = resultSet.getInt(5);
+                int TimesofDispatch = resultSet.getInt(6);
+                int TimesofChangeTemp = resultSet.getInt(7);
+                int TimesofChangeFanSpeed = resultSet.getInt(8);
+                int Duration = resultSet.getInt(9);
+                Report report= new Report(ReportId,RoomId,TotalFee,NumberofRDR,TimesofOnOff,TimesofDispatch,TimesofChangeTemp,TimesofChangeFanSpeed,Duration);
+                listReport.add(report);
+            }
+
+            FileSystemView fsv = FileSystemView.getFileSystemView();
+            File com = fsv.getHomeDirectory();
+            String deskPath = com.getPath();
+            File file = new File( deskPath + "\\" + "310fReport.txt" );
+            BufferedWriter bw = null;
+            try {
+                bw = new BufferedWriter( new FileWriter(file) );
+                for(int i = 0; i < listReport.size(); i++ ) {
+                    bw.write( listReport.get(i).toString() );
+                    bw.newLine();
+                }
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally{
+            try {
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                if(preparedStatement != null){
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                if(connection != null){
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    public List<Report> QueryReport(int roomId, String dateIn, String dateOut){
+        List<Report> listReport = new ArrayList<Report>();
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            String driverClass = "com.mysql.jdbc.Driver";
+            String url = "jdbc:mysql:///mydb";
+            String user = "root";
+            String pass= "1234";
+
+            Class.forName(driverClass);
+            connection = DriverManager.getConnection(url, user, pass);
+
+            String sql = "SELECT * FROM Report where id=roomId";
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                int ReportId = resultSet.getInt(1);
+                String RoomId = resultSet.getString(2);
+                float TotalFee = resultSet.getFloat(3);
+                int NumberofRDR = resultSet.getInt(4);
+                int TimesofOnOff = resultSet.getInt(5);
+                int TimesofDispatch = resultSet.getInt(6);
+                int TimesofChangeTemp = resultSet.getInt(7);
+                int TimesofChangeFanSpeed = resultSet.getInt(8);
+                int Duration = resultSet.getInt(9);
+                Report report= new Report(ReportId,RoomId,TotalFee,NumberofRDR,TimesofOnOff,TimesofDispatch,TimesofChangeTemp,TimesofChangeFanSpeed,Duration);
+                listReport.add(report);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally{
+            try {
+                if(resultSet != null){
+                    resultSet.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                if(preparedStatement != null){
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                if(connection != null){
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return listReport;
     }
 
     public List<RoomState> CheckRoomState(List<Integer> listRoomId) {
         return null;
     }
+
 
     public boolean PowerOn() {
         return false;
@@ -67,7 +214,7 @@ public class Server {
 
             String sql = "DELETE FROM Record WHERE id=?";
             preparedStatement = connection.prepareStatement(sql);
-            
+            preparedStatement.setInt(1,ReportId);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,14 +292,14 @@ public class Server {
 	            	int Duration = resultSet.getInt(8);
 	            	Report Report = new Report(RoomId,TotalFee,NumberOfRDR,TimesOfOnOff,TimesOfDisPatch,TimesOfChangeTemp,TimesOfChangeFanSpeed,Duration);
 	            	listReport.add(Report);
-	            	System.out.println("roomId£º"+RoomId);
-	            	System.out.println("TotalFee£º"+TotalFee);
-	            	System.out.println("NumberOfRDR£º"+NumberOfRDR);
-	            	System.out.println("TimesOfOnOff£º"+TimesOfOnOff);
-	            	System.out.println("TimesOfDisPatch£º"+TimesOfDisPatch);
-	            	System.out.println("TimesOfChangeTemp£º"+TimesOfChangeTemp);
-	            	System.out.println("TimesOfChangeFanSpeed£º"+TimesOfChangeFanSpeed);
-	            	System.out.println("Duration£º"+Duration);
+	            	System.out.println("roomIdï¿½ï¿½"+RoomId);
+	            	System.out.println("TotalFeeï¿½ï¿½"+TotalFee);
+	            	System.out.println("NumberOfRDRï¿½ï¿½"+NumberOfRDR);
+	            	System.out.println("TimesOfOnOffï¿½ï¿½"+TimesOfOnOff);
+	            	System.out.println("TimesOfDisPatchï¿½ï¿½"+TimesOfDisPatch);
+	            	System.out.println("TimesOfChangeTempï¿½ï¿½"+TimesOfChangeTemp);
+	            	System.out.println("TimesOfChangeFanSpeedï¿½ï¿½"+TimesOfChangeFanSpeed);
+	            	System.out.println("Durationï¿½ï¿½"+Duration);
 	            }
 	            
 	    	}

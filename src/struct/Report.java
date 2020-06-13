@@ -1,6 +1,8 @@
 package struct;
+
 public class Report {
-	//ÊµÌåÀàµÄ³ÉÔ±±äÁ¿ºÍÊı¾İ¿â±íµÄ×Ö¶ÎÃû³ÆºÍÀàĞÍÒ»ÖÂ
+    //å®ä½“ç±»çš„æˆå‘˜å˜é‡å’Œæ•°æ®åº“è¡¨çš„å­—æ®µåç§°å’Œç±»å‹ä¸€è‡´
+    private int ReportId;
     private String RoomId;
     private float TotalFee;
     private int NumberofRDR;
@@ -9,11 +11,12 @@ public class Report {
     private int TimesofChangeTemp;
     private int TimesofChangeFanSpeed;
     private int Duration;
-    
-    public Report(String RoomId, float TotalFee, int NumberofRDR,
-    		int TimesofOnOff, int TimesofDispatch, int TimesofChangeTemp,
-    		int TimesofChangeFanSpeed, int Duration) {
+
+    public Report(int ReportId, String RoomId, float TotalFee, int NumberofRDR,
+                  int TimesofOnOff, int TimesofDispatch, int TimesofChangeTemp,
+                  int TimesofChangeFanSpeed, int Duration) {
         super();
+        this.ReportId = ReportId;
         this.RoomId = RoomId;
         this.TotalFee = TotalFee;
         this.NumberofRDR = NumberofRDR;
@@ -23,7 +26,13 @@ public class Report {
         this.TimesofChangeFanSpeed = TimesofChangeFanSpeed;
         this.Duration = Duration;
     }
-    //´´½¨Ã¿¸ö³ÉÔ±±äÁ¿µÄsetºÍget·½·¨
+    //åˆ›å»ºæ¯ä¸ªæˆå‘˜å˜é‡çš„setå’Œgetæ–¹æ³•
+    public int getReportId() {
+        return ReportId;
+    }
+    public void setReportId(int reportId) {
+        ReportId = reportId;
+    }
     public String getRoomId() {
         return RoomId;
     }

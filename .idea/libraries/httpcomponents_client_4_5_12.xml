@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="httpcomponents-client-4.5.12">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/commons-codec-1.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/fluent-hc-4.5.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/httpclient-4.5.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/httpclient-cache-4.5.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/httpclient-osgi-4.5.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/httpclient-win-4.5.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/httpcore-4.4.13.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/httpmime-4.5.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/jna-4.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcomponents-client-4.5.12/lib/jna-platform-4.5.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
