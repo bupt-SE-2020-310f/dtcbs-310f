@@ -11,18 +11,6 @@ public class WaitClientQueue extends Queue {
      * Override method, add timer to client in waitQ and start timer.
      */
     @Override
-    public void Add(String roomId, int speed, int temp, float curTemp) {
-        if (roomId == null) {
-            return;
-        }
-        Client client = new Client(speed, temp, curTemp);
-        client.timer = new Timer(roomId, waitTime, this);
-        client.timer.TimeSet();
-        this.roomInfo.put(roomId, client);
-        this.queueLength += 1;
-    }
-
-    @Override
     public void Add(String roomId, Client client) {
         if (roomId == null || client == null) {
             return;

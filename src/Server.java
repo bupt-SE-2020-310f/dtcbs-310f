@@ -1,3 +1,5 @@
+import struct.RDR;
+import struct.Report;
 import struct.RoomState;
 
 import javax.swing.filechooser.FileSystemView;
@@ -9,13 +11,13 @@ import java.sql.*;
 import java.util.*;
 
 public class Server {
-    int mode;
-    int tempHighLimit;
-    int tempLowLimit;
-    int defaultTargetTemp;
-    float feeRateH;
-    float feeRateM;
-    float feeRateL;
+    static int mode; // 0-heat, 1-cool
+    static int tempHighLimit;
+    static int tempLowLimit;
+    static int defaultTargetTemp;
+    static float feeRateH;
+    static float feeRateM;
+    static float feeRateL;
 
     Server(){
     }
@@ -23,26 +25,26 @@ public class Server {
            int defaultTargetTemp, float feeRateH,
            float feeRateM,
            float feeRateL){
-        this.mode = mode;
-        this.tempHighLimit = tempHighLimit;
-        this.tempLowLimit = tempLowLimit;
-        this.defaultTargetTemp = defaultTargetTemp;
-        this.feeRateH = feeRateH;
-        this.feeRateM = feeRateM;
-        this.feeRateL = feeRateL;
+        Server.mode = mode;
+        Server.tempHighLimit = tempHighLimit;
+        Server.tempLowLimit = tempLowLimit;
+        Server.defaultTargetTemp = defaultTargetTemp;
+        Server.feeRateH = feeRateH;
+        Server.feeRateM = feeRateM;
+        Server.feeRateL = feeRateL;
     }
 
     void SetPara(int mode, int tempHighLimit, int tempLowLimit,
-                  int defaultTargetTemp, float feeRateH,
-                  float feeRateM,
-                  float feeRateL){
-        this.mode = mode;
-        this.tempHighLimit = tempHighLimit;
-        this.tempLowLimit = tempLowLimit;
-        this.defaultTargetTemp = defaultTargetTemp;
-        this.feeRateH = feeRateH;
-        this.feeRateM = feeRateM;
-        this.feeRateL = feeRateL;
+                 int defaultTargetTemp, float feeRateH,
+                 float feeRateM,
+                 float feeRateL){
+        Server.mode = mode;
+        Server.tempHighLimit = tempHighLimit;
+        Server.tempLowLimit = tempLowLimit;
+        Server.defaultTargetTemp = defaultTargetTemp;
+        Server.feeRateH = feeRateH;
+        Server.feeRateM = feeRateM;
+        Server.feeRateL = feeRateL;
     }
 
     public boolean PrintReport(int roomId, String dateIn, String dateOut) {
@@ -245,7 +247,7 @@ public class Server {
         return false;
     }
 
-/*    public Invoice QueryInvoice(int roomId, String StringIn, String StringOut) {
+/*    public struct.Invoice QueryInvoice(int roomId, String StringIn, String StringOut) {
         return null;
     }*/
 
@@ -271,7 +273,7 @@ public class Server {
             resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
                 String RoomId = resultSet.getString(1);
-                int  RequestTime = resultSet.getInt(2);
+                String RequestTime = resultSet.getString(2);
                 int RequestDuration = resultSet.getInt(3);
                 int FanSpeed = resultSet.getInt(4);
                 int FeeRate = resultSet.getInt(5);
@@ -332,7 +334,7 @@ public class Server {
         try {
             List<RDR> listRDR = new ArrayList<RDR>();
             DetailForm df = new DetailForm();
-            listRDR = df.QueryRDR(roomId, dateIn, dateOut);
+            listRDR = df.QueryRDR(String.valueOf(roomId), dateIn, dateOut);
             return listRDR;
         } catch (Exception e) {
             e.printStackTrace();
@@ -344,7 +346,8 @@ public class Server {
         try {
             Map<String, Object> Invoice = new HashMap<String, Object>();
             DetailForm df = new DetailForm();
-            Invoice = df.MakeInvoice(roomId, dateOut);
+            //TODO
+//            Invoice = df.MakeInvoice(roomId, "0", dateOut);
             String line = System.getProperty("line.separator");
             StringBuffer str = new StringBuffer();
             FileWriter fw = new FileWriter("C:\\310fInvoice.txt", true);
@@ -368,7 +371,8 @@ public class Server {
         try {
             Map<String, Object> Invoice = new HashMap<String, Object>();
             DetailForm df = new DetailForm();
-            Invoice = df.MakeInvoice(roomId, dateOut);
+            //TODO
+//            Invoice = df.MakeInvoice(roomId, "0", dateOut);
             String line = System.getProperty("line.separator");
             StringBuffer str = new StringBuffer();
             FileWriter fw = new FileWriter("C:\\310fInvoice.txt", true);
