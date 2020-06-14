@@ -84,7 +84,7 @@ public class ServerUI {
 
         AbstractTableModel tableModel;
         String[] title = {"编号","房间号","总费用","总服务时长","详单记录数","启动次数","调风次数"};
-        Vector<Vector<Comparable>> vectors = new Vector<>();
+        Vector<Vector<Object>> vectors = new Vector<>();
         tableModel = new AbstractTableModel() {
             @Override
             public int getRowCount() {
@@ -147,7 +147,7 @@ public class ServerUI {
                     int nRDR = jd.getInteger("nRDR");
                     int nOnOff = jd.getInteger("nOnOff");
                     int nChangeF = jd.getInteger("nChangeF");
-                    Vector<Comparable> v = new Vector<>();
+                    Vector<Object> v = new Vector<>();
                     v.add(id);
                     v.add(rmId);
                     v.add(totalFee);
@@ -392,7 +392,8 @@ public class ServerUI {
                                 JOptionPane.WARNING_MESSAGE
                         );
                         break;
-                    } else {
+                    }
+                    try {
                         vectors.removeAllElements();
                         tableModel.fireTableStructureChanged();
                         JSONArray datas = j.getJSONArray("data");
@@ -401,7 +402,7 @@ public class ServerUI {
                         for (int i = 0; i < datas.size(); i++) {
                             JSONObject jd = datas.getJSONObject(i);
                             String rmId = jd.getString("rmId");
-                            String on = onStr[jd.getBoolean("on")?0:1];
+                            String on = onStr[jd.getBoolean("on") ? 0 : 1];
                             Float currT = jd.getFloat("currT");
                             int targetT = jd.getInteger("targetT");
                             String fanSpd = fanSpdStr[jd.getInteger("fanSpd")];
@@ -416,10 +417,8 @@ public class ServerUI {
                             vectors.add(v);
                             tableModel.fireTableStructureChanged();
                         }
-                    }
-                    try {
                         Thread.sleep(1500);
-                    } catch (InterruptedException ignored) {
+                    } catch (Exception ignored) {
                         ;
                     }
                 }
@@ -468,8 +467,7 @@ public class ServerUI {
         btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                server.SetPara(mode[0]);
-                boolean status = server.PowerOn();
+                boolean status = server.PowerOn(mode[0]);
                 if (!status) {
                     JOptionPane.showMessageDialog(
                             dialog,
@@ -507,10 +505,11 @@ public class ServerUI {
             @Override
             public void windowClosing(WindowEvent e) {
                 boolean off = server.PowerOff();
-                if (!off) {
+                if (!off && Server.on) {
+                    Server.on = false;
                     JOptionPane.showMessageDialog(
                             frame,
-                            "关闭服务器出错，请手动关闭!",
+                            "关闭远程服务器出错，请手动关闭!",
                             "WarnMsg",
                             JOptionPane.WARNING_MESSAGE
                     );

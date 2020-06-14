@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
+      <artifact name="ClientUI:jar" />
+      <artifact name="ServerUI:jar" />
       <artifact name="dtcbs-310f:jar" />
     </artifacts-to-build>
   </component>
@@ -24,66 +26,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d0d6f2f0-b5f3-4cbf-96d0-00de2c13a819" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/ServerUI_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/dtcbs_310f_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ServerUI/ServerUI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/ServerUI/ServerUI.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ServerUI/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/ServerUI/src/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ServerUI/src/ServerUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/ServerUI/src/ServerUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dtcbs-310f.iml" beforeDir="false" afterPath="$PROJECT_DIR$/dtcbs-310f.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/HttpGetWithEntity.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/HttpGetWithEntity.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/Server.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/Server.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$10.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$10.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$11.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$11.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$12.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$12.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$13.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$13.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$14.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$14.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$15.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$15.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$4.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$5.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$5.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$6.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$6.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$7.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$7.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$8.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$8.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$9.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI$9.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ServerUI/ServerUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ServerUI/ServerUI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Client.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Database.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Database.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/DetailForm.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/DetailForm.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Dispatcher$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Dispatcher$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Dispatcher$HttpHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Dispatcher$HttpHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Dispatcher.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Dispatcher.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/HttpServerSys$HttpFileHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/HttpServerSys$HttpFileHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/HttpServerSys$StdErrorExceptionLogger.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/HttpServerSys$StdErrorExceptionLogger.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/HttpServerSys.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/HttpServerSys.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Queue.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Queue.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Room.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Room.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/ServeClientQueue.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/ServeClientQueue.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Server.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Server.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Test.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/TestClient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Timer$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Timer$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/Timer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/Timer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/WaitClientQueue.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/WaitClientQueue.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/Invoice.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/Invoice.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/RDR.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/RDR.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/Report.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/Report.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/RoomState.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dtcbs-310f/struct/RoomState.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DetailForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DetailForm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Dispatcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Dispatcher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Queue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Queue.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/struct/Invoice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/struct/Invoice.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/struct/RDR.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/struct/RDR.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/struct/Report.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/struct/Report.java" afterDir="false" />
-    </list>
+    <list default="true" id="d0d6f2f0-b5f3-4cbf-96d0-00de2c13a819" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -143,7 +86,7 @@
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="350" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/conf/database.properties" />
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -159,7 +102,7 @@
       <recent name="D:\Project\git-repository\dtcbs-310f - zyl" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.ServerUI">
+  <component name="RunManager" selected="Application.Dispatcher">
     <configuration name="ClientUI" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ClientUI" />
       <module name="ClientUI" />
@@ -197,8 +140,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ServerUI" />
         <item itemvalue="Application.Dispatcher" />
+        <item itemvalue="Application.ServerUI" />
         <item itemvalue="Application.ClientUI" />
         <item itemvalue="Application.Test" />
         <item itemvalue="Application.HttpFileServer" />
@@ -226,7 +169,10 @@
       <workItem from="1592125021616" duration="84000" />
       <workItem from="1592125127668" duration="9745000" />
       <workItem from="1592134936930" duration="6287000" />
-      <workItem from="1592141397548" duration="14000" />
+      <workItem from="1592141600492" duration="1542000" />
+      <workItem from="1592143785531" duration="1509000" />
+      <workItem from="1592150848221" duration="1840000" />
+      <workItem from="1592152890561" duration="2256000" />
     </task>
     <servers />
   </component>
@@ -265,10 +211,10 @@
     </state>
     <state x="574" y="122" key="#com.intellij.ide.util.MemberChooser/0.0.1536.834@0.0.1536.834" timestamp="1592139765043" />
     <state x="574" y="152" key="#com.intellij.ide.util.MemberChooser/0.30.1536.834@0.30.1536.834" timestamp="1591691219566" />
-    <state x="498" y="206" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1592134835787">
+    <state x="498" y="206" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1592151207073">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="498" y="206" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.834@0.0.1536.834" timestamp="1592134835787" />
+    <state x="498" y="206" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.834@0.0.1536.834" timestamp="1592151207073" />
     <state x="498" y="236" key="#com.intellij.ide.util.TreeClassChooserDialog/0.30.1536.834@0.30.1536.834" timestamp="1591256506552" />
     <state x="620" y="309" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1592052797444">
       <screen x="0" y="0" width="1536" height="834" />
@@ -278,34 +224,34 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="499" y="166" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.834@0.0.1536.834" timestamp="1592115292791" />
-    <state x="476" y="175" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1592125876546">
+    <state x="476" y="175" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1592142723945">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="476" y="175" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/0.0.1536.834@0.0.1536.834" timestamp="1592125876546" />
-    <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1592136781252">
+    <state x="476" y="175" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/0.0.1536.834@0.0.1536.834" timestamp="1592142723945" />
+    <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1592151223205">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834@0.0.1536.834" timestamp="1592136781252" />
+    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834@0.0.1536.834" timestamp="1592151223205" />
     <state x="549" y="202" key="FileChooserDialogImpl/0.30.1536.834@0.30.1536.834" timestamp="1591418616939" />
-    <state width="1493" height="237" key="GridCell.Tab.0.bottom" timestamp="1592141235250">
+    <state width="1493" height="171" key="GridCell.Tab.0.bottom" timestamp="1592155585500">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state width="1493" height="237" key="GridCell.Tab.0.bottom/0.0.1536.834@0.0.1536.834" timestamp="1592141235250" />
+    <state width="1493" height="171" key="GridCell.Tab.0.bottom/0.0.1536.834@0.0.1536.834" timestamp="1592155585500" />
     <state width="1493" height="142" key="GridCell.Tab.0.bottom/0.30.1536.834@0.30.1536.834" timestamp="1591876662197" />
-    <state width="1493" height="237" key="GridCell.Tab.0.center" timestamp="1592141235250">
+    <state width="1493" height="171" key="GridCell.Tab.0.center" timestamp="1592155585500">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state width="1493" height="237" key="GridCell.Tab.0.center/0.0.1536.834@0.0.1536.834" timestamp="1592141235250" />
+    <state width="1493" height="171" key="GridCell.Tab.0.center/0.0.1536.834@0.0.1536.834" timestamp="1592155585500" />
     <state width="1493" height="142" key="GridCell.Tab.0.center/0.30.1536.834@0.30.1536.834" timestamp="1591876662197" />
-    <state width="1493" height="237" key="GridCell.Tab.0.left" timestamp="1592141235250">
+    <state width="1493" height="171" key="GridCell.Tab.0.left" timestamp="1592155585500">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state width="1493" height="237" key="GridCell.Tab.0.left/0.0.1536.834@0.0.1536.834" timestamp="1592141235250" />
+    <state width="1493" height="171" key="GridCell.Tab.0.left/0.0.1536.834@0.0.1536.834" timestamp="1592155585500" />
     <state width="1493" height="142" key="GridCell.Tab.0.left/0.30.1536.834@0.30.1536.834" timestamp="1591876662197" />
-    <state width="1493" height="237" key="GridCell.Tab.0.right" timestamp="1592141235250">
+    <state width="1493" height="171" key="GridCell.Tab.0.right" timestamp="1592155585500">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state width="1493" height="237" key="GridCell.Tab.0.right/0.0.1536.834@0.0.1536.834" timestamp="1592141235250" />
+    <state width="1493" height="171" key="GridCell.Tab.0.right/0.0.1536.834@0.0.1536.834" timestamp="1592155585500" />
     <state width="1493" height="142" key="GridCell.Tab.0.right/0.30.1536.834@0.30.1536.834" timestamp="1591876662197" />
     <state width="1493" height="195" key="GridCell.Tab.1.bottom" timestamp="1591876662193">
       <screen x="0" y="30" width="1536" height="834" />
@@ -323,15 +269,19 @@
       <screen x="0" y="30" width="1536" height="834" />
     </state>
     <state width="1493" height="195" key="GridCell.Tab.1.right/0.30.1536.834@0.30.1536.834" timestamp="1591876662193" />
-    <state x="408" y="120" key="NewModule_or_Project.wizard" timestamp="1592113975250">
+    <state x="408" y="120" key="NewModule_or_Project.wizard" timestamp="1592141774554">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="408" y="120" key="NewModule_or_Project.wizard/0.0.1536.834@0.0.1536.834" timestamp="1592113975250" />
-    <state x="226" y="0" key="SettingsEditor" timestamp="1592141405227">
+    <state x="408" y="120" key="NewModule_or_Project.wizard/0.0.1536.834@0.0.1536.834" timestamp="1592141774554" />
+    <state x="226" y="0" key="SettingsEditor" timestamp="1592151408474">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="226" y="0" key="SettingsEditor/0.0.1536.834@0.0.1536.834" timestamp="1592141405227" />
+    <state x="226" y="0" key="SettingsEditor/0.0.1536.834@0.0.1536.834" timestamp="1592151408474" />
     <state x="226" y="30" key="SettingsEditor/0.30.1536.834@0.30.1536.834" timestamp="1591418630597" />
+    <state x="543" y="289" key="classpath-attribute-editor" timestamp="1592144034770">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="543" y="289" key="classpath-attribute-editor/0.0.1536.834@0.0.1536.834" timestamp="1592144034770" />
     <state x="0" y="30" width="600" height="834" key="find.popup" timestamp="1591420334672">
       <screen x="0" y="30" width="1536" height="834" />
     </state>

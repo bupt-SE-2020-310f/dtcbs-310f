@@ -30,32 +30,16 @@ public class Server {
     public static final String TIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(TIME_FORMAT);
 
-    // server info
-    static int mode; // 0-heat, 1-cool
-    static int tempHighLimit;
-    static int tempLowLimit;
-    static int defaultTargetTemp;
-    static int defaultFanSpeed;
-    static float feeRateH;
-    static float feeRateM;
-    static float feeRateL;
+    static boolean on = false;
+    static int mode;
 
-    void SetPara(int mode){
-        Server.mode = mode;
-        Server.tempHighLimit = 25;
-        Server.tempLowLimit = 18;
-        Server.defaultTargetTemp = 22;
-        Server.defaultFanSpeed = 1;
-        Server.feeRateH = 1;
-        Server.feeRateM = (float)0.5;
-        Server.feeRateL = (float)1/3;
-    }
-
-    public boolean PowerOn() {
+    public boolean PowerOn(int mode) {
         LinkedList<String> vals = new LinkedList<>();
-        vals.add(String.valueOf(mode));
+        Server.mode = mode;
+        Server.on = true;
+        vals.add(String.valueOf(Server.mode));
         String s = craftStr(powerOnS, vals);
-        JSONObject send = JSON.parseObject("{\"mode\":" + mode + "}");
+        JSONObject send = JSON.parseObject("{\"on\":" + on + "}");
         JSONObject j = doPost(send, s);
         return (j != null);
     }
@@ -78,7 +62,7 @@ public class Server {
             dO = Server.DATE_FORMAT.parse(dateOut).getTime();
             vals.add(String.valueOf(dO));
         } catch (ParseException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         System.out.println(vals);
         String s = craftStr(queryRDR, vals);
@@ -98,7 +82,7 @@ public class Server {
             dO = Server.DATE_FORMAT.parse(dateOut).getTime();
             vals.add(String.valueOf(dO));
         } catch (ParseException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         String s = craftStr(queryInvoice, vals);
         JSONObject send = JSON.parseObject("{\"rmId\":" + rmId
@@ -117,7 +101,7 @@ public class Server {
             dO = Server.DATE_FORMAT.parse(dateOut).getTime();
             vals.add(String.valueOf(dO));
         } catch (ParseException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         System.out.println(dI + " " + dO);
         String s = craftStr(queryReport, vals);
@@ -156,7 +140,7 @@ public class Server {
             }
             client.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         return null;
     }
@@ -180,7 +164,7 @@ public class Server {
             }
             client.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());;
         }
         return null;
     }

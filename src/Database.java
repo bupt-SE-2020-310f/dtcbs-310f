@@ -19,7 +19,8 @@ public class Database {
 	public static Connection getConnection() {
 		Properties properties = new Properties();
 		try {
-			properties.load(Database.class.getResourceAsStream("database.properties"));
+//			properties.load(Database.class.getResourceAsStream("database.properties"));
+			properties.load(new FileInputStream("conf/database.properties"));
 			Database.driverName = properties.getProperty("DRIVERNAME");
 			Database.url = properties.getProperty("URL");
 			Database.user = properties.getProperty("USER");
@@ -31,7 +32,7 @@ public class Database {
 					Database.password
 			);
 		} catch (IOException | ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 
 		return conn;
@@ -66,7 +67,7 @@ public class Database {
 				System.out.println("Table Report created.");
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return true;
 	}

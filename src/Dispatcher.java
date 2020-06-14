@@ -54,9 +54,6 @@ public class Dispatcher extends HttpServerSys {
     Dispatcher(){
         super();
         core = new Server();
-        //TODO
-//        core.SetPara(0, 25, 18,
-//                22, 1, 1, (float) 0.5, (float) 1/3);
         sQueue = new ServeClientQueue();
         wQueue = new WaitClientQueue();
         sQueue.tother = wQueue;
@@ -93,8 +90,7 @@ public class Dispatcher extends HttpServerSys {
                 throw new MethodNotSupportedException(method + " method not supported");
             }
             String target = request.getRequestLine().getUri();
-            //TODO
-            if (!target.contains("/fee")) {
+            if (!target.contains("/fee") && !target.contains("/monitor")) {
                 System.out.print(target + "\n");
             }
             String[] paths = target.split("/");
@@ -372,8 +368,6 @@ public class Dispatcher extends HttpServerSys {
                             jsonObject.put("data", datas);
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonObject));
-                            //TODO
-//                            System.out.println("Fee request Room:" + this.ctrl.roomId2id.get(id));
                         }
                         else if (type.equals("queryInvoice")) {
                             System.out.println("GET");
@@ -452,7 +446,7 @@ public class Dispatcher extends HttpServerSys {
                                     try {
                                         Thread.sleep(2000);
                                     } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                                        System.err.println(e.getMessage());
                                     }
                                     System.out.println("exit");
                                     System.exit(0);
@@ -461,7 +455,6 @@ public class Dispatcher extends HttpServerSys {
                         }
                     }
                 } catch (NumberFormatException e){
-                    e.printStackTrace();
                     System.err.print("Wrong uri params from client: " + request.getRequestLine() + "\n");
                 }
             }
