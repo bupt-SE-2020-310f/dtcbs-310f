@@ -44,9 +44,4 @@ public class ServeClientQueue extends Queue {
         }
         return id;
     }
-
-    @Override
-    public List<RoomState> CheckRoomState(List<String> listRoomId) {
-        return super.CheckRoomState(listRoomId);
-    }
 }

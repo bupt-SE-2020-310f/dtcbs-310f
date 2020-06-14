@@ -1,3 +1,4 @@
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
@@ -11,6 +12,9 @@ import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
+import struct.Invoice;
+import struct.RDR;
+import struct.Report;
 import struct.RoomState;
 
 import java.io.IOException;
@@ -50,8 +54,9 @@ public class Dispatcher extends HttpServerSys {
     Dispatcher(){
         super();
         core = new Server();
-        core.SetPara(0, 25, 18,
-                22, 1, 1, (float) 0.5, (float) 1/3);
+        //TODO
+//        core.SetPara(0, 25, 18,
+//                22, 1, 1, (float) 0.5, (float) 1/3);
         sQueue = new ServeClientQueue();
         wQueue = new WaitClientQueue();
         sQueue.tother = wQueue;
@@ -310,6 +315,130 @@ public class Dispatcher extends HttpServerSys {
                     System.err.print("Wrong uri params from client: " + request.getRequestLine() + "\n");
                 }
 
+            }
+            else if (paths[1].equals("server") && paths[2] != null) {
+                String[] typeAndArgs = paths[2].split("\\?");
+                String type = typeAndArgs[0];
+                String[] args = typeAndArgs[1].split("&");
+                try {
+                    if (method.equals("GET")) {
+                        if (type.equals("monitor")) { // monitor
+                            JSONObject jsonObject = new JSONObject();
+                            List<RoomState> roomStateList = sQ().CheckRoomState();
+
+                            jsonObject.put("status", 0);
+                            jsonObject.put("msg", "成功");
+                            JSONArray datas = new JSONArray();
+                            for (RoomState rs : roomStateList) {
+                                JSONObject jsonData = new JSONObject();
+                                jsonData.put("rmId", rs.getRmId());
+                                jsonData.put("on", rs.isOn());
+                                jsonData.put("currT", rs.getCurrentTemp());
+                                jsonData.put("targetT", rs.getTargetTemp());
+                                jsonData.put("fanSpd", rs.getFanSpeed());
+                                jsonData.put("fee", rs.getFee());
+                                datas.add(jsonData);
+                            }
+                            jsonObject.put("data", datas);
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonObject));
+                        }
+                        else if (type.equals("queryRDR")) {
+                            String[] values = new String[3];
+                            for (int i = 0; i < args.length; i++) {
+                                //id & currentTemperature & changeTemperature
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            String rmId = values[0];
+                            String dateIn = values[1];
+                            String dateOut = values[2];
+                            List<RDR> res = ctrl.core.QueryRDR(rmId, dateIn, dateOut);
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("status", 0);
+                            jsonObject.put("msg", "成功");
+                            JSONArray datas = new JSONArray();
+                            for (RDR rs : res) {
+                                JSONObject jsonData = new JSONObject();
+                                jsonData.put("rmId", rs.getRoomId());
+                                jsonData.put("requestTime", rs.getRequestDuration());
+                                jsonData.put("duration", rs.getRequestDuration());
+                                jsonData.put("fanSpd", rs.getFanSpeed());
+                                jsonData.put("feeRate", rs.getFeeRate());
+                                jsonData.put("fee", rs.getFee());
+                                datas.add(jsonData);
+                            }
+                            jsonObject.put("data", datas);
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonObject));
+                            //TODO
+//                            System.out.println("Fee request Room:" + this.ctrl.roomId2id.get(id));
+                        }
+                        else if (type.equals("queryInvoice")) {
+                            String[] values = new String[3];
+                            for (int i = 0; i < args.length; i++) {
+                                //id & currentTemperature & changeTemperature
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            String rmId = values[0];
+                            String dateIn = values[1];
+                            String dateOut = values[2];
+                            Invoice invoice = ctrl.core.QueryInvoice(rmId, dateIn, dateOut);
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("status", 0);
+                            jsonObject.put("msg", "成功");
+                            jsonObject.put("totalFee", invoice.getFee());
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonObject));
+                        }
+                        else if (type.equals("queryReport")) {
+                            String[] values = new String[3];
+                            for (int i = 0; i < args.length; i++) {
+                                //id & currentTemperature & changeTemperature
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            int rmId = Integer.parseInt(values[0]);
+                            String dateIn = values[1];
+                            String dateOut = values[2];
+                            List<Report> res = ctrl.core.QueryReport(rmId, dateIn, dateOut);
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("status", 0);
+                            jsonObject.put("msg", "成功");
+                            JSONArray datas = new JSONArray();
+                            for (Report rs : res) {
+                                JSONObject jd = new JSONObject();
+                                jd.put("id", rs.getReportId());
+                                jd.put("rmId", rs.getRoomId());
+                                jd.put("totalFee", rs.getTotalFee());
+                                jd.put("duration", rs.getDuration());
+                                jd.put("nOnOff", rs.getTimesofOnOff());
+                                jd.put("nChangeF", rs.getTimesofChangeFanSpeed());
+                                datas.add(jd);
+                            }
+                            jsonObject.put("data", datas);
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonObject));
+                        }
+                    }
+                    else if (method.equals("POST")) {
+                        if (type.equals("poweron")) { // poweron
+                            String[] values = new String[1];
+                            for (int i = 0; i < args.length; i++) {
+                                //id & currentTemperature & changeTemperature
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            int mode = Integer.parseInt(values[0]);
+                            ctrl.core.SetPara(mode, 25, 18, 22, 1, 1, (float)0.5, (float)1/3);
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("status", 0);
+                            jsonObject.put("msg", "成功");
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonObject));
+                        }
+                    }
+                } catch (NumberFormatException e){
+                    e.printStackTrace();
+                    System.err.print("Wrong uri params from client: " + request.getRequestLine() + "\n");
+                }
             }
         }
         private ServeClientQueue sQ(){

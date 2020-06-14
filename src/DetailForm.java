@@ -82,7 +82,7 @@ public class DetailForm {
         	System.out.println("RoomId:"+RoomId);
         	System.out.println("RoomId:"+DateIn);
         	System.out.println("DateOut:"+DateOut);
-        	System.out.println("DateOut:"+TotalFee);
+        	System.out.println("TotalFee:"+TotalFee);
         	Invoice Invoice = new Invoice(RoomId,DateIn,DateOut,TotalFee);
         	return Invoice;
 	    }

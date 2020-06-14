@@ -18,7 +18,7 @@ public class Client {
 	int fanSpeed;
 	float fee;
 	float feeRate;
-	int duration;
+	long duration;
 	int priority;
 	int targetTemp;
 	float currentTemp;
@@ -74,7 +74,7 @@ public class Client {
 	public RoomState GetRoomState() {
 		preTime = currentTime;
 		currentTime = System.currentTimeMillis();
-		duration += currentTemp - startTime;
+		duration = currentTime - startTime;
 		if (timer != null) {
 			timer.waitTime -= currentTime - preTime;
 		}

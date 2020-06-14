@@ -185,13 +185,8 @@ public class Server {
         return listReport;
     }
 
-    public List<RoomState> CheckRoomState(List<Integer> listRoomId) {
-        return null;
-    }
-
-
     public boolean PowerOn() {
-        return false;
+        return true;
     }
     
     public boolean DeleteReport(int ReportId, String date) {
@@ -325,40 +320,40 @@ public class Server {
 	}
 
     public boolean PrintRDR(String roomId, String dateIn, String dateOut) {
-    	List<RDR> listReport = new ArrayList<RDR>();
-    	DetailForm RDR = new DetailForm();
-    	listReport = RDR.QueryRDR(roomId, dateIn, dateOut);
-    	FileSystemView fsv = FileSystemView.getFileSystemView();
+        List<RDR> listReport = new ArrayList<RDR>();
+        DetailForm RDR = new DetailForm();
+        listReport = RDR.QueryRDR(roomId, dateIn, dateOut);
+        FileSystemView fsv = FileSystemView.getFileSystemView();
         File com = fsv.getHomeDirectory();
         String deskPath = com.getPath();
         File file = new File( deskPath + "\\" + "310fRDR.txt" );
         BufferedWriter bw = null;
         try {
-        	bw = new BufferedWriter( new FileWriter(file) );
-        	for(int i = 0; i < listReport.size(); i++ ) {
-        		bw.write( listReport.get(i).toString() );
-        		bw.newLine();
-        		}
-        	bw.close();
-        	return true;
-        	} catch (IOException e) {
-        		e.printStackTrace();
-        		return false;
-        	}
+            bw = new BufferedWriter( new FileWriter(file) );
+            for(int i = 0; i < listReport.size(); i++ ) {
+                bw.write( listReport.get(i).toString() );
+                bw.newLine();
+            }
+            bw.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-    
+
     public List<RDR> QueryRDR(String roomId, String dateIn, String dateOut){
-    	try {
-    		List<RDR> listRDR = new ArrayList<RDR>();
-    		DetailForm df = new DetailForm();
-    		listRDR = df.QueryRDR(roomId, dateIn, dateOut);
-    		return listRDR;
-    	} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+        try {
+            List<RDR> listRDR = new ArrayList<RDR>();
+            DetailForm df = new DetailForm();
+            listRDR = df.QueryRDR(roomId, dateIn, dateOut);
+            return listRDR;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-    
+
     public Invoice QueryInvoice(String roomId, String dateIn ,String dateOut){
     	DetailForm df = new DetailForm();
 		return df.MakeInvoice(roomId, dateIn, dateOut);

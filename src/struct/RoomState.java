@@ -12,12 +12,12 @@ public class RoomState {
     private String rmId;
     private float fee;
     private float feeRate;
-    private int duration;
+    private long duration;
     private int fanSpeed;
     private int targetTemp;
     private float currentTemp;
 
-    public RoomState(boolean on, String id, String rmId, float fee, float feeRate, int duration, int fanSpeed, int targetTemp, float currentTemp) {
+    public RoomState(boolean on, String id, String rmId, float fee, float feeRate, long duration, int fanSpeed, int targetTemp, float currentTemp) {
         this.on = on;
         this.id = id;
         this.rmId = rmId;
@@ -69,11 +69,11 @@ public class RoomState {
         this.feeRate = feeRate;
     }
 
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 

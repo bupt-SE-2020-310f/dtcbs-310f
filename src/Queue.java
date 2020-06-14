@@ -166,6 +166,17 @@ public class Queue {
         return roomStateList;
     }
 
+    public List<RoomState> CheckRoomState() {
+        List<RoomState> roomStateList = new ArrayList<>();
+        for (String roomId : this.roomInfo.keySet()) {
+            roomStateList.add(this.Get(roomId).GetRoomState());
+        }
+        for (String roomId : this.tother.roomInfo.keySet()) {
+            roomStateList.add(this.tother.Get(roomId).GetRoomState());
+        }
+        return roomStateList;
+    }
+
     /**
      * Change target fanSpeed  as well as feeRate of target room.
      * Put the client into tail of queue and make a record.
