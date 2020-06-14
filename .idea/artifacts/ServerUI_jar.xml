@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact name="ServerUI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ServerUI_jar</output-path>
+    <root id="root">
+      <element id="archive" name="ServerUI.jar">
+        <element id="module-output" name="ServerUI" />
+      </element>
+      <element id="library" level="project" name="fastjson-1.2.70" />
+      <element id="library" level="project" name="httpcomponents-client-4.5.12" />
+    </root>
+  </artifact>
+</component>
