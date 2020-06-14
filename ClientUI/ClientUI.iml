@@ -2,12 +2,10 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../dtcbs-310f - zyl/ClientUI">
-      <sourceFolder url="file://$MODULE_DIR$/../../dtcbs-310f - zyl/ClientUI/src" isTestSource="false" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="fastjson-1.2.70" level="project" />
-    <orderEntry type="library" name="httpcomponents-client-4.5.12" level="project" />
   </component>
 </module>

@@ -19,7 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d0d6f2f0-b5f3-4cbf-96d0-00de2c13a819" name="Default Changelist" comment="" />
+    <list default="true" id="d0d6f2f0-b5f3-4cbf-96d0-00de2c13a819" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ClientUI/ClientUI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/ClientUI/ClientUI.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Test.java" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,8 +52,8 @@
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="403" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../dtcbs-310f - nzh/ClientUI" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ClientUI" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
@@ -58,6 +63,7 @@
       <recent name="" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Project\git-repository\dtcbs-310f" />
       <recent name="D:\Project\git-repository\dtcbs-310f - zyl" />
     </key>
   </component>
@@ -122,6 +128,9 @@
       <workItem from="1592079290787" duration="207000" />
       <workItem from="1592079750087" duration="20282000" />
       <workItem from="1592112103740" duration="156000" />
+      <workItem from="1592113587464" duration="106000" />
+      <workItem from="1592113770996" duration="47000" />
+      <workItem from="1592113832311" duration="688000" />
     </task>
     <servers />
   </component>
@@ -167,10 +176,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="620" y="309" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1536.834@0.0.1536.834" timestamp="1592052797444" />
-    <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1592112142052">
+    <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1592113957595">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834@0.0.1536.834" timestamp="1592112142052" />
+    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834@0.0.1536.834" timestamp="1592113957595" />
     <state x="549" y="202" key="FileChooserDialogImpl/0.30.1536.834@0.30.1536.834" timestamp="1591418616939" />
     <state width="1493" height="388" key="GridCell.Tab.0.bottom" timestamp="1592112024780">
       <screen x="0" y="0" width="1536" height="834" />
@@ -208,13 +217,14 @@
       <screen x="0" y="30" width="1536" height="834" />
     </state>
     <state width="1493" height="195" key="GridCell.Tab.1.right/0.30.1536.834@0.30.1536.834" timestamp="1591876662193" />
-    <state x="408" y="120" key="NewModule_or_Project.wizard" timestamp="1592112168772">
+    <state x="408" y="120" key="NewModule_or_Project.wizard" timestamp="1592113975250">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="408" y="120" key="NewModule_or_Project.wizard/0.0.1536.834@0.0.1536.834" timestamp="1592112168772" />
-    <state x="226" y="30" key="SettingsEditor" timestamp="1591418630597">
-      <screen x="0" y="30" width="1536" height="834" />
+    <state x="408" y="120" key="NewModule_or_Project.wizard/0.0.1536.834@0.0.1536.834" timestamp="1592113975250" />
+    <state x="226" y="0" key="SettingsEditor" timestamp="1592113981018">
+      <screen x="0" y="0" width="1536" height="834" />
     </state>
+    <state x="226" y="0" key="SettingsEditor/0.0.1536.834@0.0.1536.834" timestamp="1592113981018" />
     <state x="226" y="30" key="SettingsEditor/0.30.1536.834@0.30.1536.834" timestamp="1591418630597" />
     <state x="0" y="30" width="600" height="834" key="find.popup" timestamp="1591420334672">
       <screen x="0" y="30" width="1536" height="834" />

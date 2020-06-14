@@ -63,7 +63,7 @@ public class Client {
 		fanSpeed = speed;
 		feeRate = (float)1 / (3-speed);
 		//TODO
-//		this.Record(rmId,startTime.format(date),speed,feeRate);
+		this.Record(rmId,startTime.format(date),speed,feeRate);
 	}
 
 	/**
