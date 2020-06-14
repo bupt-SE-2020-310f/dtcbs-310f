@@ -2,13 +2,14 @@ package struct;
 
 public class RDR {
     private String RoomId;
-    private String RequestTime;
+    private long RequestTime;
     private long RequestDuration;
     private int FanSpeed;
     private float FeeRate;
     private float Fee;
+    private int Cate;
 
-    public RDR(String RoomId, String RequestTime, long RequestDuration,int FanSpeed, float FeeRate, float Fee) {
+    public RDR(String RoomId, long RequestTime, long RequestDuration, int FanSpeed, float FeeRate, float Fee, int cate) {
         super();
         this.RoomId = RoomId;
         this.RequestTime = RequestTime;
@@ -16,6 +17,7 @@ public class RDR {
         this.FanSpeed = FanSpeed;
         this.FeeRate = FeeRate;
         this.Fee = Fee;
+        this.Cate = cate;
     }
     //创建每个成员变量的set和get方法
     public String getRoomId() {
@@ -24,10 +26,10 @@ public class RDR {
     public void setRoomId(String RoomId) {
         this.RoomId = RoomId;
     }
-    public String getRequestTime() {
+    public long getRequestTime() {
         return RequestTime;
     }
-    public void setRequestTime(String RequestTime) {
+    public void setRequestTime(long RequestTime) {
         this.RequestTime = RequestTime;
     }
     public long getRequestDuration() {
@@ -53,5 +55,11 @@ public class RDR {
     }
     public void setFee(float fee) {
         Fee = fee;
+    }
+    public int getCate() {
+        return Cate;
+    }
+    public void setCate(int cate) {
+        Cate = cate;
     }
 }

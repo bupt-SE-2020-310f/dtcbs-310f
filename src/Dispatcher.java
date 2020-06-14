@@ -64,6 +64,8 @@ public class Dispatcher extends HttpServerSys {
 
         calendar = Calendar.getInstance();
         calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),1,0,0,0);
+
+        Database.createTables();
     }
 
 
@@ -350,8 +352,8 @@ public class Dispatcher extends HttpServerSys {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String rmId = values[0];
-                            String dateIn = values[1];
-                            String dateOut = values[2];
+                            long dateIn = Long.parseLong(values[1]);
+                            long dateOut = Long.parseLong(values[2]);
                             List<RDR> res = ctrl.core.QueryRDR(rmId, dateIn, dateOut);
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("status", 0);
@@ -374,19 +376,20 @@ public class Dispatcher extends HttpServerSys {
 //                            System.out.println("Fee request Room:" + this.ctrl.roomId2id.get(id));
                         }
                         else if (type.equals("queryInvoice")) {
+                            System.out.println("GET");
                             String[] values = new String[3];
                             for (int i = 0; i < args.length; i++) {
                                 //id & currentTemperature & changeTemperature
                                 values[i] = (args[i].split("=")[1]);
                             }
                             String rmId = values[0];
-                            String dateIn = values[1];
-                            String dateOut = values[2];
+                            long dateIn = Long.parseLong(values[1]);
+                            long dateOut = Long.parseLong(values[2]);
                             Invoice invoice = ctrl.core.QueryInvoice(rmId, dateIn, dateOut);
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("status", 0);
                             jsonObject.put("msg", "成功");
-                            jsonObject.put("totalFee", invoice.getFee());
+                            jsonObject.put("totalFee", (invoice==null)?0:(invoice.getFee()));
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonObject));
                         }
@@ -397,24 +400,21 @@ public class Dispatcher extends HttpServerSys {
                                 values[i] = (args[i].split("=")[1]);
                             }
                             int rmId = Integer.parseInt(values[0]);
-                            String dateIn = values[1];
-                            String dateOut = values[2];
-                            List<Report> res = ctrl.core.QueryReport(rmId, dateIn, dateOut);
+                            long dateIn = Long.parseLong(values[1]);
+                            long dateOut = Long.parseLong(values[2]);
+                            Report res = ctrl.core.QueryReport(rmId, dateIn, dateOut);
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("status", 0);
                             jsonObject.put("msg", "成功");
-                            JSONArray datas = new JSONArray();
-                            for (Report rs : res) {
-                                JSONObject jd = new JSONObject();
-                                jd.put("id", rs.getReportId());
-                                jd.put("rmId", rs.getRoomId());
-                                jd.put("totalFee", rs.getTotalFee());
-                                jd.put("duration", rs.getDuration());
-                                jd.put("nOnOff", rs.getTimesofOnOff());
-                                jd.put("nChangeF", rs.getTimesofChangeFanSpeed());
-                                datas.add(jd);
-                            }
-                            jsonObject.put("data", datas);
+                            JSONObject jd = new JSONObject();
+                            jd.put("id", res.getReportId());
+                            jd.put("rmId", res.getRoomId());
+                            jd.put("duration", res.getDuration());
+                            jd.put("totalFee", res.getTotalFee());
+                            jd.put("nRDR", res.getNumberofRDR());
+                            jd.put("nOnOff", res.getTimesofOnOff());
+                            jd.put("nChangeF", res.getTimesofChangeFanSpeed());
+                            jsonObject.put("data", jd);
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonObject));
                         }
@@ -433,6 +433,31 @@ public class Dispatcher extends HttpServerSys {
                             jsonObject.put("msg", "成功");
                             response.setStatusCode(HttpStatus.SC_OK);
                             response.setEntity(sendBack(jsonObject));
+                        }
+                        else if (type.equals("poweroff")) {
+                            String[] values = new String[1];
+                            for (int i = 0; i < args.length; i++) {
+                                //id & currentTemperature & changeTemperature
+                                values[i] = (args[i].split("=")[1]);
+                            }
+                            int mode = Integer.parseInt(values[0]);
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("status", 0);
+                            jsonObject.put("msg", "成功");
+                            response.setStatusCode(HttpStatus.SC_OK);
+                            response.setEntity(sendBack(jsonObject));
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    System.out.println("exit");
+                                    System.exit(0);
+                                }
+                            }).start();
                         }
                     }
                 } catch (NumberFormatException e){
@@ -497,12 +522,8 @@ public class Dispatcher extends HttpServerSys {
         private void Update(String id, int fanSpd, int temp, float currT){
             Client c;
             if (sQ().IsIn(id)){
-                if (temp != 0) {
-                    c = sQ().Get(id);
-                } else {
-                    c = sQ().Pop(id);
-                    wQ().Add(id, c);
-                }
+                c = sQ().Pop(id);
+                wQ().Add(id, c);
             } else {
                 c = wQ().Get(id);
             }
@@ -513,6 +534,7 @@ public class Dispatcher extends HttpServerSys {
                 } else {
                     c.priority = fanSpd;
                 }
+                c.Enable(fanSpd, 0);
                 c.fanSpeed = fanSpd;
                 c.on = true;
                 c.targetTemp = temp;

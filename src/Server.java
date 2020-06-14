@@ -4,12 +4,14 @@ import struct.Report;
 import struct.RoomState;
 
 import javax.swing.filechooser.FileSystemView;
+import javax.xml.crypto.Data;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -40,7 +42,7 @@ public class Server {
         Server.feeRateL = feeRateL;
     }
 
-    public boolean PrintReport(int roomId, String dateIn, String dateOut) {
+    public boolean PrintReport(int roomId, long dateIn, long dateOut) {
         List<Report> listReport = new ArrayList<Report>();
 
         Connection connection = null;
@@ -48,29 +50,21 @@ public class Server {
         ResultSet resultSet = null;
 
         try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
+            connection = Database.getConnection();
 
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "SELECT * FROM Report where id=roomId";
+            String sql = "SELECT * FROM Report where RoomId=" + roomId;
             preparedStatement = connection.prepareStatement(sql);
 
             resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
                 int ReportId = resultSet.getInt(1);
                 String RoomId = resultSet.getString(2);
-                float TotalFee = resultSet.getFloat(3);
-                int NumberofRDR = resultSet.getInt(4);
-                int TimesofOnOff = resultSet.getInt(5);
-                int TimesofDispatch = resultSet.getInt(6);
-                int TimesofChangeTemp = resultSet.getInt(7);
-                int TimesofChangeFanSpeed = resultSet.getInt(8);
-                int Duration = resultSet.getInt(9);
-                Report report= new Report(ReportId,RoomId,TotalFee,NumberofRDR,TimesofOnOff,TimesofDispatch,TimesofChangeTemp,TimesofChangeFanSpeed,Duration);
+                long Duration = resultSet.getLong(3);
+                float TotalFee = resultSet.getFloat(4);
+                int NumberofRDR = resultSet.getInt(5);
+                int TimesofOnOff = resultSet.getInt(6);
+                int TimesofChangeFanSpeed = resultSet.getInt(7);
+                Report report= new Report(String.valueOf(roomId),Duration,TotalFee,NumberofRDR,TimesofOnOff,TimesofChangeFanSpeed);
                 listReport.add(report);
             }
 
@@ -122,38 +116,56 @@ public class Server {
         return false;
     }
 
-    public List<Report> QueryReport(int roomId, String dateIn, String dateOut){
-        List<Report> listReport = new ArrayList<Report>();
-
+    public Report QueryReport(int roomId, long dateIn, long dateOut){
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
+        Report report = null;
 
         try {
-            String driverClass = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql:///mydb";
-            String user = "root";
-            String pass= "1234";
-
-            Class.forName(driverClass);
-            connection = DriverManager.getConnection(url, user, pass);
-
-            String sql = "SELECT * FROM Report where id=roomId";
+            connection = Database.getConnection();
+            String sql = "SELECT sum(Fee) as TotalFee, sum(RequestDuration) as Duration From Record WHERE RoomId=" + roomId
+                    + " and RequestTime>=" + dateIn
+                    + " and RequestTime<" + dateOut;
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-                int ReportId = resultSet.getInt(1);
-                String RoomId = resultSet.getString(2);
-                float TotalFee = resultSet.getFloat(3);
-                int NumberofRDR = resultSet.getInt(4);
-                int TimesofOnOff = resultSet.getInt(5);
-                int TimesofDispatch = resultSet.getInt(6);
-                int TimesofChangeTemp = resultSet.getInt(7);
-                int TimesofChangeFanSpeed = resultSet.getInt(8);
-                int Duration = resultSet.getInt(9);
-                Report report= new Report(ReportId,RoomId,TotalFee,NumberofRDR,TimesofOnOff,TimesofDispatch,TimesofChangeTemp,TimesofChangeFanSpeed,Duration);
-                listReport.add(report);
+            float totalFee = 0;
+            long duration = 0;
+            if (resultSet.next()) {
+                totalFee = resultSet.getFloat(1);
+                duration = resultSet.getLong(2);
             }
+            sql = "SELECT count(*) as nOnOff From Record WHERE RoomId=" + roomId
+                    + " and RequestTime>=" + dateIn
+                    + " and RequestTime<" + dateOut
+                    + " and Cate=" + 0;
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            int nOnOff = 0;
+            if (resultSet.next()) {
+                nOnOff = resultSet.getInt(1);
+            }
+            sql = "SELECT count(*) as nOnOff From Record WHERE RoomId=" + roomId
+                    + " and RequestTime>=" + dateIn
+                    + " and RequestTime<" + dateOut
+                    + " and Cate=" + 1;
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            int nChangeF = 0;
+            if (resultSet.next()) {
+                nChangeF = resultSet.getInt(1);
+            }
+            int nRDR = nChangeF + nOnOff;
+            report= new Report(String.valueOf(roomId),duration,totalFee,nRDR,nOnOff,nChangeF);
+            sql = "insert into Report(RoomId,Duration,TotalFee,NumberofRDR,TimesofOnOff,TimesofChangeFanSpeed) values(?, ?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, report.getRoomId());
+            preparedStatement.setLong(2, report.getDuration());
+            preparedStatement.setFloat(3,report.getTotalFee());
+            preparedStatement.setInt(4,report.getNumberofRDR());
+            preparedStatement.setInt(5, report.getTimesofOnOff());
+            preparedStatement.setInt(6, report.getTimesofChangeFanSpeed());
+            int res = preparedStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
@@ -182,144 +194,14 @@ public class Server {
             }
         }
 
-        return listReport;
+        return report;
     }
 
     public boolean PowerOn() {
         return true;
     }
-    
-    public boolean DeleteReport(int ReportId, String date) {
-    	Database db = new Database();
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        try {
-            Class.forName(db.driverName);
-            connection = DriverManager.getConnection(db.url, db.user, db.password);
 
-            String sql = "DELETE FROM Record WHERE id=?";
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,ReportId);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally{
-            try {
-            	preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if(connection != null){
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-		return false;
-    }
-    
-    public boolean PrintReport(Date date, List<String> listRoomId, String typeReport) {
-    	try {
-    		List<Report> listReport = new ArrayList<Report>();
-    		listReport = this.QueryReport(date, listRoomId, typeReport);
-            FileSystemView fsv = FileSystemView.getFileSystemView();
-            File com = fsv.getHomeDirectory();
-            String deskPath = com.getPath();
-            File file = new File( deskPath + "\\" + "310fReport.txt" );
-            BufferedWriter bw = null;
-            try {
-            	bw = new BufferedWriter( new FileWriter(file) );
-            	for(int i = 0; i < listReport.size(); i++ ) {
-            		bw.write( listReport.get(i).toString() );
-            		bw.newLine();
-            		}
-            	bw.close();
-            	} catch (IOException e) {
-            		e.printStackTrace();
-            	}
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public List<Report> QueryReport(Date date, List<String> listRoomId, String typeReport){
-    	Database db = new Database();
-    	List<Report> listReport = new ArrayList<Report>();
-    	
-		Connection connection = null;
-    	PreparedStatement preparedStatement = null;
-    	ResultSet resultSet = null;
-    	
-        try {
-            Class.forName(db.driverName);
-            connection = DriverManager.getConnection(db.url, db.user, db.password);
-	    	for(int i=0; i<listRoomId.size(); i++) {
-	            String roomId = listRoomId.get(i);
-	            String sql = "SELECT RoomId,sum(FeeRate) as TotalFee,count(StartTime) as NumberOfRDR,"
-	            		+ "count(StartTime) as TimesOfOnOff,count(StartTime) as TimesOfDisPatch,"
-	            		+ "count(StartTime) as TimesOfChangeTemp,count(distinct FanSpeed) as TimesOfChangeFanSpeed"
-	            		+ "sum((Termination-StartTime)sec) as Duration"
-	            		+ "from Record where RoomId="+roomId;
-	            preparedStatement = connection.prepareStatement(sql);
-	            resultSet = preparedStatement.executeQuery();
-	            while(resultSet.next()) {
-	                int ReportId = resultSet.getInt(1);
-	            	String RoomId = resultSet.getString(2);
-	            	float TotalFee = resultSet.getFloat(3);
-	            	int NumberOfRDR = resultSet.getInt(4);
-	            	int TimesOfOnOff = resultSet.getInt(5);
-	            	int TimesOfDisPatch = resultSet.getInt(6);
-	            	int TimesOfChangeTemp = resultSet.getInt(7);
-	            	int TimesOfChangeFanSpeed = resultSet.getInt(8);
-	            	int Duration = resultSet.getInt(9);
-	            	Report Report = new Report(ReportId,RoomId,TotalFee,NumberOfRDR,TimesOfOnOff,TimesOfDisPatch,TimesOfChangeTemp,TimesOfChangeFanSpeed,Duration);
-	            	listReport.add(Report);
-	            	System.out.println("roomId��"+RoomId);
-	            	System.out.println("TotalFee��"+TotalFee);
-	            	System.out.println("NumberOfRDR��"+NumberOfRDR);
-	            	System.out.println("TimesOfOnOff��"+TimesOfOnOff);
-	            	System.out.println("TimesOfDisPatch��"+TimesOfDisPatch);
-	            	System.out.println("TimesOfChangeTemp��"+TimesOfChangeTemp);
-	            	System.out.println("TimesOfChangeFanSpeed��"+TimesOfChangeFanSpeed);
-	            	System.out.println("Duration��"+Duration);
-	            }
-	            
-	    	}
-    	} catch (Exception e) {
-            e.printStackTrace();
-        } finally{
-            try {
-                if(resultSet != null){
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(preparedStatement != null){
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if(connection != null){
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    	return listReport;
-	}
-
-    public boolean PrintRDR(String roomId, String dateIn, String dateOut) {
+    public boolean PrintRDR(String roomId, long dateIn, long dateOut) {
         List<RDR> listReport = new ArrayList<RDR>();
         DetailForm RDR = new DetailForm();
         listReport = RDR.QueryRDR(roomId, dateIn, dateOut);
@@ -342,7 +224,7 @@ public class Server {
         }
     }
 
-    public List<RDR> QueryRDR(String roomId, String dateIn, String dateOut){
+    public List<RDR> QueryRDR(String roomId, long dateIn, long dateOut){
         try {
             List<RDR> listRDR = new ArrayList<RDR>();
             DetailForm df = new DetailForm();
@@ -354,16 +236,15 @@ public class Server {
         }
     }
 
-    public Invoice QueryInvoice(String roomId, String dateIn ,String dateOut){
+    public Invoice QueryInvoice(String roomId, long dateIn ,long dateOut){
     	DetailForm df = new DetailForm();
 		return df.MakeInvoice(roomId, dateIn, dateOut);
     }
 
-    public boolean PrintInvoice(String roomId, String dateIn ,String dateOut) {
-    	List<Invoice> listInvoice = new ArrayList<Invoice>();
+    public boolean PrintInvoice(String roomId, long dateIn ,long dateOut) {
 		DetailForm df = new DetailForm();
-		listInvoice.add(df.MakeInvoice(roomId, dateIn, dateOut));
-		
+		Invoice invoice = df.MakeInvoice(roomId, dateIn, dateOut);
+
 		FileSystemView fsv = FileSystemView.getFileSystemView();
 		File com = fsv.getHomeDirectory();
 		String deskPath = com.getPath();
@@ -371,10 +252,8 @@ public class Server {
 		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter( new FileWriter(file) );
-			for(int i = 0; i < listInvoice.size(); i++ ) {
-				bw.write( listInvoice.get(i).toString() );
-				bw.newLine();
-				}
+			bw.write(invoice.toString());
+			bw.newLine();
 			bw.close();
 			return true;
 			} catch (IOException e) {

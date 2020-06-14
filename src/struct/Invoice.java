@@ -2,11 +2,11 @@ package struct;
 
 public class Invoice {
 	String roomId;
-	String dateIn;
-	String dateOut;
+	long dateIn;
+	long dateOut;
 	float fee;
 	
-	public Invoice(String roomId, String dateIn, String dateOut, float fee) {
+	public Invoice(String roomId, long dateIn, long dateOut, float fee) {
 		this.roomId = roomId;
 		this.dateIn = dateIn;
 		this.dateOut = dateOut;
@@ -20,17 +20,17 @@ public class Invoice {
         this.roomId = roomId;
     }
     
-	public String getDateIn() {
+	public long getDateIn() {
         return dateIn;
     }
-    public void setDateIn(String dateIn) {
+    public void setDateIn(long dateIn) {
         this.dateIn = dateIn;
     }
     
-	public String getDateOut() {
+	public long getDateOut() {
         return dateOut;
     }
-    public void setDateOut(String dateOut) {
+    public void setDateOut(long dateOut) {
         this.dateOut = dateOut;
     }
     

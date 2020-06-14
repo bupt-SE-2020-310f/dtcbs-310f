@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ClientUI/ClientUI.iml" filepath="$PROJECT_DIR$/ClientUI/ClientUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/ServerUI/ServerUI.iml" filepath="$PROJECT_DIR$/ServerUI/ServerUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/dtcbs-310f.iml" filepath="$PROJECT_DIR$/dtcbs-310f.iml" />
     </modules>

@@ -5,6 +5,8 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 
 public class ServerUI {
@@ -54,7 +56,7 @@ public class ServerUI {
     }
 
     private void showReportDialog(JFrame owner, Component parentComp) {
-        JDialog dialog = new JDialog(owner, "日报", true);
+        JDialog dialog = new JDialog(owner, "日报", false);
         dialog.setLocationRelativeTo(parentComp);
         dialog.setSize(800, 500);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -66,13 +68,13 @@ public class ServerUI {
         hBox1.add(tx1);
         vBox.add(hBox1);
         JLabel lb2 = new JLabel("查询起始日期");
-        JTextField tx2 = new JTextField();
+        JTextField tx2 = new JTextField(Server.TIME_FORMAT);
         Box hBox2 = Box.createHorizontalBox();
         hBox2.add(lb2);
         hBox2.add(tx2);
         vBox.add(hBox2);
         JLabel lb3 = new JLabel("查询截止日期");
-        JTextField tx3 = new JTextField();
+        JTextField tx3 = new JTextField(Server.TIME_FORMAT);
         Box hBox3 = Box.createHorizontalBox();
         hBox3.add(lb3);
         hBox3.add(tx3);
@@ -81,7 +83,7 @@ public class ServerUI {
         vBox.add(btn);
 
         AbstractTableModel tableModel;
-        String[] title = {"编号","房间号","总费用","总服务时长","启动次数","调风次数"};
+        String[] title = {"编号","房间号","总费用","总服务时长","详单记录数","启动次数","调风次数"};
         Vector<Vector<Comparable>> vectors = new Vector<>();
         tableModel = new AbstractTableModel() {
             @Override
@@ -137,25 +139,24 @@ public class ServerUI {
                 } else {
                     vectors.removeAllElements();
                     tableModel.fireTableStructureChanged();
-                    JSONArray datas = j.getJSONArray("data");;
-                    for (int i = 0; i < datas.size(); i++) {
-                        JSONObject jd = datas.getJSONObject(i);
-                        int id = jd.getInteger("id");
-                        String rmId = jd.getString("rmId");
-                        Float totalFee = jd.getFloat("totalFee");
-                        long duration = jd.getLong("duration");
-                        int nOnOff = jd.getInteger("nOnOff");
-                        int nChangeF = jd.getInteger("nChangeF");
-                        Vector<Comparable> v = new Vector<>();
-                        v.add(id);
-                        v.add(rmId);
-                        v.add(totalFee);
-                        v.add(duration);
-                        v.add(nOnOff);
-                        v.add(nChangeF);
-                        vectors.add(v);
-                        tableModel.fireTableStructureChanged();
-                    }
+                    JSONObject jd = j.getJSONObject("data");
+                    int id = jd.getInteger("id");
+                    String rmId = jd.getString("rmId");
+                    Float totalFee = jd.getFloat("totalFee");
+                    long duration = jd.getLong("duration")/1000;
+                    int nRDR = jd.getInteger("nRDR");
+                    int nOnOff = jd.getInteger("nOnOff");
+                    int nChangeF = jd.getInteger("nChangeF");
+                    Vector<Comparable> v = new Vector<>();
+                    v.add(id);
+                    v.add(rmId);
+                    v.add(totalFee);
+                    v.add(duration+"s");
+                    v.add(nRDR);
+                    v.add(nOnOff);
+                    v.add(nChangeF);
+                    vectors.add(v);
+                    tableModel.fireTableStructureChanged();
                 }
             }
         });
@@ -165,33 +166,29 @@ public class ServerUI {
     }
 
     private void showInvoiceDialog(JFrame owner, Component parentComp) {
-        JDialog dialog = new JDialog(owner, "详单", true);
+        JDialog dialog = new JDialog(owner, "详单", false);
         dialog.setLocationRelativeTo(parentComp);
-        dialog.setSize(800, 500);
+        dialog.setSize(400, 400);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        Box vBox = Box.createVerticalBox();
+
+        JPanel jPanel = new JPanel(null);
+
         JLabel lb1 = new JLabel("房间号");
+        lb1.setBounds(10, 10, 100, 50);
         JTextField tx1 = new JTextField();
-        Box hBox1 = Box.createHorizontalBox();
-        hBox1.add(lb1);
-        hBox1.add(tx1);
-        vBox.add(hBox1);
+        tx1.setBounds(150, 10, 200, 50);
         JLabel lb2 = new JLabel("查询起始日期");
-        JTextField tx2 = new JTextField();
-        Box hBox2 = Box.createHorizontalBox();
-        hBox2.add(lb2);
-        hBox2.add(tx2);
-        vBox.add(hBox2);
+        lb2.setBounds(10, 70, 100, 50);
+        JTextField tx2 = new JTextField(Server.TIME_FORMAT);
+        tx2.setBounds(150, 70, 200, 50);
         JLabel lb3 = new JLabel("查询截止日期");
-        JTextField tx3 = new JTextField();
-        Box hBox3 = Box.createHorizontalBox();
-        hBox3.add(lb3);
-        hBox3.add(tx3);
-        vBox.add(hBox3);
+        lb3.setBounds(10, 130, 100, 50);
+        JTextField tx3 = new JTextField(Server.TIME_FORMAT);
+        tx3.setBounds(150, 130, 200, 50);
         JLabel tf = new JLabel("$totalFee");
-        vBox.add(tf);
+        tf.setBounds(100, 200, 100, 50);
         JButton btn = new JButton("查询");
-        vBox.add(btn);
+        btn.setBounds(250, 200, 100, 50);
         btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -210,12 +207,21 @@ public class ServerUI {
             }
         });
 
-        dialog.setContentPane(vBox);
+        jPanel.add(lb1);
+        jPanel.add(tx1);
+        jPanel.add(lb2);
+        jPanel.add(tx2);
+        jPanel.add(lb3);
+        jPanel.add(tx3);
+        jPanel.add(btn);
+        jPanel.add(tf);
+
+        dialog.setContentPane(jPanel);
         dialog.setVisible(true);
     }
 
     private void showRDRDialog(JFrame owner, Component parentComp) {
-        JDialog dialog = new JDialog(owner, "详单", true);
+        JDialog dialog = new JDialog(owner, "详单", false);
         dialog.setLocationRelativeTo(parentComp);
         dialog.setSize(800, 500);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -227,13 +233,13 @@ public class ServerUI {
         hBox1.add(tx1);
         vBox.add(hBox1);
         JLabel lb2 = new JLabel("查询起始日期");
-        JTextField tx2 = new JTextField();
+        JTextField tx2 = new JTextField(Server.TIME_FORMAT);
         Box hBox2 = Box.createHorizontalBox();
         hBox2.add(lb2);
         hBox2.add(tx2);
         vBox.add(hBox2);
         JLabel lb3 = new JLabel("查询截止日期");
-        JTextField tx3 = new JTextField();
+        JTextField tx3 = new JTextField(Server.TIME_FORMAT);
         Box hBox3 = Box.createHorizontalBox();
         hBox3.add(lb3);
         hBox3.add(tx3);
@@ -243,7 +249,7 @@ public class ServerUI {
 
         AbstractTableModel tableModel;
         String[] title = {"房间号","请求时间","服务时长","风速","费率","单次费用"};
-        Vector<Vector<Comparable>> vectors = new Vector<>();
+        Vector<Vector<Object>> vectors = new Vector<>();
         tableModel = new AbstractTableModel() {
             @Override
             public int getRowCount() {
@@ -303,15 +309,15 @@ public class ServerUI {
                     for (int i = 0; i < datas.size(); i++) {
                         JSONObject jd = datas.getJSONObject(i);
                         String rmId = jd.getString("rmId");
-                        String requestTime = jd.getString("requestTime");
-                        long duration = jd.getLong("duration");
+                        String requestTime = Server.DATE_FORMAT.format(jd.getLong("requestTime"));
+                        long duration = jd.getLong("duration")/1000;
                         String fanSpd = fanSpdStr[jd.getInteger("fanSpd")];
                         Float feeRate = jd.getFloat("feeRate");
                         Float fee = jd.getFloat("fee");
-                        Vector<Comparable> v = new Vector<>();
+                        Vector<Object> v = new Vector<>();
                         v.add(rmId);
                         v.add(requestTime);
-                        v.add(duration);
+                        v.add(duration+"s");
                         v.add(fanSpd);
                         v.add(feeRate);
                         v.add(fee);
@@ -327,14 +333,14 @@ public class ServerUI {
     }
 
     private void showMonitorDialog(JFrame owner, Component parentComp) {
-        JDialog dialog = new JDialog(owner, "Monitor", true);
+        JDialog dialog = new JDialog(owner, "Monitor", false);
         dialog.setLocationRelativeTo(parentComp);
         dialog.setSize(800, 500);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         AbstractTableModel tableModel;
         String[] title = {"房间号","空调状态","当前温度","目标温度","当前风速","当前费用"};
-        Vector<Vector<Comparable>> vectors = new Vector<>();
+        Vector<Vector<Object>> vectors = new Vector<>();
         tableModel = new AbstractTableModel() {
             @Override
             public int getRowCount() {
@@ -390,16 +396,17 @@ public class ServerUI {
                         vectors.removeAllElements();
                         tableModel.fireTableStructureChanged();
                         JSONArray datas = j.getJSONArray("data");
+                        String[] onStr = new String[]{"开机","关机"};
                         String[] fanSpdStr = new String[]{"低","中","高"};
                         for (int i = 0; i < datas.size(); i++) {
                             JSONObject jd = datas.getJSONObject(i);
                             String rmId = jd.getString("rmId");
-                            Boolean on = jd.getBoolean("on");
+                            String on = onStr[jd.getBoolean("on")?0:1];
                             Float currT = jd.getFloat("currT");
                             int targetT = jd.getInteger("targetT");
                             String fanSpd = fanSpdStr[jd.getInteger("fanSpd")];
                             Float fee = jd.getFloat("fee");
-                            Vector<Comparable> v = new Vector<>();
+                            Vector<Object> v = new Vector<>();
                             v.add(rmId);
                             v.add(on);
                             v.add(currT);
@@ -412,14 +419,15 @@ public class ServerUI {
                     }
                     try {
                         Thread.sleep(1500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (InterruptedException ignored) {
+                        ;
                     }
                 }
             }
         });
         timer.start();
         dialog.addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowClosed(WindowEvent e) {
                 running[0] = false;
@@ -434,15 +442,17 @@ public class ServerUI {
     }
 
     private void showPowerOnDialog(JFrame owner, Component parentComp) {
-        JDialog dialog = new JDialog(owner, "PowerOn", true); // modal，模态
+        JDialog dialog = new JDialog(owner, "PowerOn", true);
         dialog.setLocationRelativeTo(parentComp);
-        dialog.setSize(400, 200);
+        dialog.setSize(200, 200);
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(null);
         JLabel lb1 = new JLabel("空调模式");
+        lb1.setBounds(10, 10, 50, 50);
         String[] modes = new String[]{"制热","制冷"};
         JComboBox<String> comboBox = new JComboBox<>(modes);
+        comboBox.setBounds(100, 20, 60, 20);
         comboBox.setSelectedIndex(0);
         final int[] mode = {0};
         comboBox.addItemListener(new ItemListener() {
@@ -454,6 +464,7 @@ public class ServerUI {
             }
         });
         JButton btn = new JButton("确认");
+        btn.setBounds(50, 100, 100, 40);
         btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -490,7 +501,29 @@ public class ServerUI {
         Server server = new Server();
         frame.setContentPane(new ServerUI(server, frame).panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 800);
+        frame.setSize(800, 600);
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                boolean off = server.PowerOff();
+                if (!off) {
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "关闭服务器出错，请手动关闭!",
+                            "WarnMsg",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                } else {
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "即将退出!",
+                            "okMsg",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                }
+            }
+        });
 
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);

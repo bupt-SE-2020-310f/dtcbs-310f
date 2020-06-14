@@ -1,6 +1,7 @@
 
 import struct.RoomState;
 
+import javax.xml.crypto.Data;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,7 +27,7 @@ public class Client {
 	long startTime;
 	long currentTime;
 	long preTime;
-	DetailForm detailForm;
+	long currentStartTime;
 	Timer timer;
 
 	Client() {
@@ -38,6 +39,7 @@ public class Client {
 		this.duration = 0;
 		this.startTime = System.currentTimeMillis();
 		this.currentTime = startTime;
+		this.currentStartTime = startTime;
 		this.timer = null;
 	}
 
@@ -54,16 +56,21 @@ public class Client {
 		this.duration = 0;
 		this.startTime = System.currentTimeMillis();
 		this.currentTime = startTime;
+		this.currentStartTime = startTime;
 		this.timer = null;
 	}
 
-	public void Enable(int mode, int speed) {
-		Date date = new Date();
-		SimpleDateFormat startTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	/**
+	 * record power on and change fanSpeed event
+	 *
+	 * @param speed
+	 */
+	public void Enable(int speed, int on) {
+		currentTime = System.currentTimeMillis();
 		fanSpeed = speed;
 		feeRate = (float)1 / (3-speed);
-		//TODO
-		this.Record(rmId,startTime.format(date),speed,feeRate);
+		this.Record(rmId, currentTime,(currentTime-currentStartTime),speed,feeRate,fee,on);
+		currentStartTime = currentTime;
 	}
 
 	/**
@@ -83,9 +90,9 @@ public class Client {
 		return new RoomState(on, id, rmId, fee, feeRate, duration, fanSpeed, targetTemp, currentTemp);
 	}
 
-	public void Record(String roomId, String startTime, int fanSpeed, float feeRate) {
+	public void Record(String roomId, long startTime, long duration, int fanSpeed, float feeRate, float fee, int on) {
 		DetailForm detailForm = new DetailForm();
-		detailForm.InsertRecord(roomId, startTime, fanSpeed, feeRate);
+		detailForm.InsertRecord(roomId, startTime, duration, fanSpeed, feeRate, fee, on);
 	}
 
 }

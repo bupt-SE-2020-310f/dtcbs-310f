@@ -188,7 +188,7 @@ public class Queue {
         if (IsIn(roomId)) {
             Client client = this.Pop(roomId);
             this.Add(roomId, client);
-            client.Enable(Server.mode, speed); // change fanSpeed and feeRate, and insert a record
+            client.Enable(speed,1); // change fanSpeed and feeRate, and insert a record
         }
     }
 
