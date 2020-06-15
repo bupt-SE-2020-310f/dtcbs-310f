@@ -1,6 +1,6 @@
 ##### 运行前准备
 1. 修改`/conf/database.properties`文件中数据库连接属性
-> 开发时默认使用mysql，支持修改为sqlserver
+> 数据库平台使用mysql
 2. 创建本地数据库`dtcbs310f`
 3. 不需要手动建表
 
