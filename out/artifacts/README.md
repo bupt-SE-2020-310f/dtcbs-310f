@@ -17,7 +17,7 @@
 
 ##### 推荐退出方式
 1. 先将所有处于PowerOn状态的`ClientUI`执行PowerOff
-2. 将所有`ClientUI`关闭
+2. 将所有处于CheckIn状态的`ClientUI`执行CheckOut，然后关闭窗口
 3. 最后关闭`ServerUI`窗口，会主动尝试自动关闭`dtcbs-310f`
 
 ##### 注意事项
