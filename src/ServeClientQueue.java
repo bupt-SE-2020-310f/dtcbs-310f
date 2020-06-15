@@ -11,13 +11,14 @@ import java.util.List;
  * @since 5 June 2020
  */
 public class ServeClientQueue extends Queue {
+    public static int SQLEN = 3;
 
     @Override
     public void Add(String roomId, Client client) {
         if (roomId == null || client == null) {
             return;
         }
-        client.on = true;
+        client.state = Client.SERVED;
         this.roomInfo.put(roomId, client);
         this.queueLength += 1;
     }
@@ -37,7 +38,7 @@ public class ServeClientQueue extends Queue {
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
             Client client = this.Get(roomId);
-            if (client.on && client.priority < low) {
+            if (client.priority < low) {
                 low = client.priority;
                 id = roomId;
             }

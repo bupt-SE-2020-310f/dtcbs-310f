@@ -24,6 +24,7 @@ public class Server {
     static float feeRateH;
     static float feeRateM;
     static float feeRateL;
+    static int updateDelay = 1500;
 
     Server(){
     }
@@ -40,6 +41,10 @@ public class Server {
         Server.feeRateH = feeRateH;
         Server.feeRateM = feeRateM;
         Server.feeRateL = feeRateL;
+    }
+
+    public boolean PowerOn() {
+        return true;
     }
 
     public boolean PrintReport(int roomId, long dateIn, long dateOut) {
@@ -195,10 +200,6 @@ public class Server {
         }
 
         return report;
-    }
-
-    public boolean PowerOn() {
-        return true;
     }
 
     public boolean PrintRDR(String roomId, long dateIn, long dateOut) {

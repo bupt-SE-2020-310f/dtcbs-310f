@@ -8,10 +8,5 @@ You should commit your code to your own branches, and I'll merge them to the mas
 
 You should check the issue page regularly to ensure you won't miss any information.
 
-# excutable files
-/out/dtcbs-310f.jar
-/out/ClientUI.jar
-/out/ServerUI.jar
-
-# configure files
-/out/conf/database.properties ---set database parameters fo your own environment.
+# Excutable files path
+/out/artifacts/

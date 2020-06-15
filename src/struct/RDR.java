@@ -3,16 +3,18 @@ package struct;
 public class RDR {
     private String RoomId;
     private long RequestTime;
+    private String RequestTimeStr;
     private long RequestDuration;
     private int FanSpeed;
     private float FeeRate;
     private float Fee;
     private int Cate;
 
-    public RDR(String RoomId, long RequestTime, long RequestDuration, int FanSpeed, float FeeRate, float Fee, int cate) {
+    public RDR(String RoomId, long RequestTime, String RequestTimeStr, long RequestDuration, int FanSpeed, float FeeRate, float Fee, int cate) {
         super();
         this.RoomId = RoomId;
         this.RequestTime = RequestTime;
+        this.RequestTimeStr = RequestTimeStr;
         this.RequestDuration = RequestDuration;
         this.FanSpeed = FanSpeed;
         this.FeeRate = FeeRate;
@@ -31,6 +33,12 @@ public class RDR {
     }
     public void setRequestTime(long RequestTime) {
         this.RequestTime = RequestTime;
+    }
+    public String getRequestTimeStr() {
+        return RequestTimeStr;
+    }
+    public void setRequestTimeStr(String requestTimeStr) {
+        RequestTimeStr = requestTimeStr;
     }
     public long getRequestDuration() {
         return RequestDuration;

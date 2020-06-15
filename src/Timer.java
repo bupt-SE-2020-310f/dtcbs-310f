@@ -7,23 +7,26 @@
 public class Timer {
     Thread timeThread;
     int waitTime;
+    String roomId;
 
     /**
      * Initialize the timer for client at roomId.
      *
-     * @param roomId identifier of room
+     * @param rmId identifier of room
      * @param time time slice length
      * @param queue timer attched to the queue, and used for callback
      */
-    public Timer(String roomId, int time, Queue queue) {
+    public Timer(String rmId, int time, Queue queue) {
         waitTime = time;
+        roomId = rmId;
         timeThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(time);
                     synchronized (Queue.QLOCK) {
-                        queue.TimeOut(roomId);
+                        System.out.println(rmId + " timer out");
+                        ((WaitClientQueue)queue).TimeOut(roomId);
                     }
                 } catch (InterruptedException ignored) {
 
@@ -49,5 +52,6 @@ public class Timer {
         } catch (InterruptedException ignored) {
 
         }
+        System.out.println(roomId + "timer canceled");
     }
 }

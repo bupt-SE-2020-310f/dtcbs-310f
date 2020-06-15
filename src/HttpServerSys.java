@@ -53,7 +53,7 @@ public class HttpServerSys {
             } else if (ex instanceof ConnectionClosedException) {
                 System.err.println(ex.getMessage());
             } else {
-                System.err.println(ex.getMessage());
+                ex.printStackTrace();
             }
         }
 

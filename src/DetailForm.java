@@ -23,15 +23,17 @@ public class DetailForm {
 		}
 		try {
 			System.out.println("Connection Successful!");
-			String sql="insert into Record(RoomId,RequestTime,RequestDuration,FanSpeed,FeeRate,Fee,Cate) values(?, ?, ?, ?, ?, ?, ?)";
+			String sql="insert into Record(RoomId,RequestTime,RequestTimeStr,RequestDuration,FanSpeed,FeeRate,Fee,Cate) values(?, ?, ?, ?, ?, ?, ?, ?)";
 			st=conn.prepareStatement(sql);
 			st.setString(1, roomId);
 			st.setLong(2, startTime);
-			st.setLong(3, duration);
-			st.setInt(4, fanSpeed);
-			st.setFloat(5, feeRate);
-			st.setFloat(6, fee);
-			st.setInt(7, cate);
+			Database.DATE.setTime(startTime);
+			st.setString(3, Database.DATE_FORMAT.format(Database.DATE));
+			st.setLong(4, duration);
+			st.setInt(5, fanSpeed);
+			st.setFloat(6, feeRate);
+			st.setFloat(7, fee);
+			st.setInt(8, cate);
 			int result=st.executeUpdate();
 			st.close();
 			conn.close();
@@ -63,13 +65,14 @@ public class DetailForm {
 			while(resultSet.next()){
 				String RoomId = resultSet.getString(1);
 				long RequestTime = resultSet.getLong(2);
-				long RequestDuration = resultSet.getLong(3);
-				int FanSpeed = resultSet.getInt(4);
-				float FeeRate = resultSet.getFloat(5);
-				float Fee = resultSet.getFloat(6);
-				int Cate = resultSet.getInt(7);
+				String RequestTimeStr = resultSet.getString(3);
+				long RequestDuration = resultSet.getLong(4);
+				int FanSpeed = resultSet.getInt(5);
+				float FeeRate = resultSet.getFloat(6);
+				float Fee = resultSet.getFloat(7);
+				int Cate = resultSet.getInt(8);
 
-				RDR RDR= new RDR(RoomId, RequestTime, RequestDuration, FanSpeed, FeeRate, Fee, Cate);
+				RDR RDR= new RDR(RoomId, RequestTime, RequestTimeStr, RequestDuration, FanSpeed, FeeRate, Fee, Cate);
 				listRDR.add(RDR);
 			}
 		} catch (Exception e) {

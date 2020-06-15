@@ -2,6 +2,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 public class Database {
@@ -15,6 +16,7 @@ public class Database {
 	public static Statement st;
 	public static final String TIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Database.TIME_FORMAT);
+	public static final Date DATE = new Date();
 
 	public static Connection getConnection() {
 		Properties properties = new Properties();
@@ -43,7 +45,8 @@ public class Database {
 		String sql1 = "DROP TABLE IF EXISTS Record;";
 		String sql2 = "CREATE TABLE Record ("
 				+ "RoomId VARCHAR(255) NOT NULL,"
-				+ "RequestTime VARCHAR(255),"
+				+ "RequestTime BIGINT,"
+				+ "RequestTimeStr VARCHAR(255),"
 				+ "RequestDuration BIGINT,"
 				+ "FanSpeed INT,"
 				+ "FeeRate FLOAT,"

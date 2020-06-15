@@ -13,7 +13,11 @@ import java.util.Date;
  * @since 9 June 2020
  */
 public class Client {
-	boolean on;
+	int state; // 0served 1wait 2standby 3shutdown
+	public static int SERVED = 0;
+	public static int WAIT = 1;
+	public static int STANDBY = 2;
+	public static int SHUTDOWN = 3;
 	String id;
 	String rmId;
 	int fanSpeed;
@@ -21,55 +25,39 @@ public class Client {
 	float feeRate;
 	long duration;
 	int priority;
+	public static int P_LAST = -1;
 	int targetTemp;
 	float currentTemp;
 	float preTemp;
 	long startTime;
 	long currentTime;
-	long preTime;
 	long currentStartTime;
+	long prevStTime;
 	Timer timer;
 
-	Client() {
-		this.fanSpeed = Server.defaultFanSpeed;
-		this.feeRate = (float)1 / this.fanSpeed;
-		this.fee = 0;
-		this.priority = this.fanSpeed;
-		this.targetTemp = Server.defaultTargetTemp;
-		this.duration = 0;
-		this.startTime = System.currentTimeMillis();
-		this.currentTime = startTime;
-		this.currentStartTime = startTime;
-		this.timer = null;
-	}
-
 	Client(String rmId, String id, float currTmep){
-		this.fanSpeed = Server.defaultFanSpeed;
-		this.feeRate = (float)1 / this.fanSpeed;
 		this.id = id;
 		this.rmId = rmId;
 		this.fee = 0;
-		this.priority = this.fanSpeed;
 		this.currentTemp = currTmep;
-		this.preTemp = currTmep;
 		this.targetTemp = Server.defaultTargetTemp;
 		this.duration = 0;
-		this.startTime = System.currentTimeMillis();
-		this.currentTime = startTime;
-		this.currentStartTime = startTime;
 		this.timer = null;
+		this.priority = Client.P_LAST;
+		this.state = Client.SHUTDOWN;
 	}
 
 	/**
 	 * record power on and change fanSpeed event
 	 *
-	 * @param speed
+	 * @param speed target fanSpd to set or change
+	 * @param cate event category: 0powerOn, 1changSpd
 	 */
-	public void Enable(int speed, int on) {
+	public void Enable(int speed, int cate) {
 		currentTime = System.currentTimeMillis();
 		fanSpeed = speed;
 		feeRate = (float)1 / (3-speed);
-		this.Record(rmId, currentTime,(currentTime-currentStartTime),speed,feeRate,fee,on);
+		this.Record(rmId, currentTime,(currentTime-currentStartTime),speed,feeRate,fee,cate);
 		currentStartTime = currentTime;
 	}
 
@@ -79,20 +67,24 @@ public class Client {
 	 * @return this
 	 */
 	public RoomState GetRoomState() {
-		preTime = currentTime;
 		currentTime = System.currentTimeMillis();
 		duration = currentTime - startTime;
 		if (timer != null) {
-			timer.waitTime -= currentTime - preTime;
+			timer.waitTime -= currentTime - prevStTime;
 		}
 		fee += feeRate * Math.abs(currentTemp - preTemp);
 		preTemp = currentTemp;
-		return new RoomState(on, id, rmId, fee, feeRate, duration, fanSpeed, targetTemp, currentTemp);
+		prevStTime = currentTime;
+		long waitTime = 0;
+		if (timer != null) {
+			waitTime = timer.waitTime;
+		}
+		return new RoomState(state, id, rmId, fee, feeRate, duration, fanSpeed, targetTemp, currentTemp, waitTime);
 	}
 
-	public void Record(String roomId, long startTime, long duration, int fanSpeed, float feeRate, float fee, int on) {
+	public void Record(String roomId, long startTime, long duration, int fanSpeed, float feeRate, float fee, int cate) {
 		DetailForm detailForm = new DetailForm();
-		detailForm.InsertRecord(roomId, startTime, duration, fanSpeed, feeRate, fee, on);
+		detailForm.InsertRecord(roomId, startTime, duration, fanSpeed, feeRate, fee, cate);
 	}
 
 }

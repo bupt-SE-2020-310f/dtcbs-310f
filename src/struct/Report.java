@@ -48,7 +48,7 @@ public class Report {
     public int getTimesofOnOff() {
         return TimesofOnOff;
     }
-    public void TimesofOnOff(int TimesofOnOff) {
+    public void setTimesofOnOff(int TimesofOnOff) {
         this.TimesofOnOff = TimesofOnOff;
     }
     public int getTimesofChangeFanSpeed() {

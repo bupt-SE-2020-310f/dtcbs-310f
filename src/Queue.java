@@ -41,13 +41,10 @@ public class Queue {
      * Bind the room associated with roomId with a client,
      * and add the client to self.roomInfo.
      * Self.queueLength plus 1.
+     * Overrided by subclass
      */
     public void Add(String roomId, Client client) {
-        if (roomId == null || client == null) {
-            return;
-        }
-        this.roomInfo.put(roomId, client);
-        this.queueLength += 1;
+
     }
 
     /**
@@ -75,8 +72,6 @@ public class Queue {
     }
 
     /**
-     * room1 associated with rmId1 is binded with client1 in this queue,
-     * room2 associated with rmId2 is binded with client2 in tother queue.
      * Exchange client1 with client2.
      *
      * @param rmId1 identifier of room1
@@ -92,8 +87,6 @@ public class Queue {
         this.tother.Add(rmId1, client1);
     }
 
-
-
     /**
      * Get the roomId for the room,
      * the room is binded with the client that has the lowest priority.
@@ -107,7 +100,7 @@ public class Queue {
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
             Client client = this.Get(roomId);
-            if (client.on && client.priority < low) {
+            if (client.state != Client.SHUTDOWN && client.state != Client.STANDBY && client.priority < low) {
                 low = client.priority;
                 id = roomId;
             }
@@ -124,11 +117,11 @@ public class Queue {
      * @return identifier of target room
      */
     public String HasHighestPriority() {
-        int high = -2;
+        int high = Client.P_LAST;
         String id = null;
         for (String roomId : this.roomInfo.keySet()) {
             Client client = this.Get(roomId);
-            if (client.on && client.priority > high) {
+            if (client.state != Client.SHUTDOWN && client.state != Client.STANDBY && client.priority > high) {
                 high = client.priority;
                 id = roomId;
             }
@@ -189,48 +182,6 @@ public class Queue {
             Client client = this.Pop(roomId);
             this.Add(roomId, client);
             client.Enable(speed,1); // change fanSpeed and feeRate, and insert a record
-        }
-    }
-
-    /**
-     * Change target temperature of target room
-     *
-     * @param roomId identifier of romm
-     * @param temp target temperature
-     */
-    public void ChangeTemp(String roomId, int temp) {
-        if (IsIn(roomId)) {
-            this.Get(roomId).targetTemp = temp;
-        }
-    }
-
-    /**
-     * When a client has waitted for a time slice in waitQ, this method will be invoked by Timer class.
-     * This client will be exchanged with a target client in serveQ,
-     * target client has the lower or the same priority, if priorities are equal, select the first one.
-     * If no such target client, then do nothing.
-     *
-     * @param roomId identifier of room in timeout
-     */
-    public void TimeOut(String roomId) {
-        if (this instanceof WaitClientQueue && this.IsIn(roomId)) {
-            // exchange this client in waitQ with client having lower or the same priority in serveQ
-            int level = -1;
-            if (this.Get(roomId) != null) {
-                level = this.Get(roomId).priority;
-            }
-            String roomId2 = ((ServeClientQueue)this.tother).HasLowerPriority(level+1);
-            if (roomId2 == null) {
-                return;
-            }
-            this.Exchange(roomId, roomId2);
-            for (String id : this.roomInfo.keySet()) {
-                Client client = this.Get(id);
-                if (client.timer != null && client.timer.waitTime < 3000) {
-                    client.timer.TimeCancel();
-                    client.timer = null;
-                }
-            }
         }
     }
 }

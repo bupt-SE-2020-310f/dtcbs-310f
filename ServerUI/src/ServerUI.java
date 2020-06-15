@@ -309,7 +309,8 @@ public class ServerUI {
                     for (int i = 0; i < datas.size(); i++) {
                         JSONObject jd = datas.getJSONObject(i);
                         String rmId = jd.getString("rmId");
-                        String requestTime = Server.DATE_FORMAT.format(jd.getLong("requestTime"));
+                        Server.DATE.setTime(jd.getLong("requestTime"));
+                        String requestTime = Server.DATE_FORMAT.format(Server.DATE);
                         long duration = jd.getLong("duration")/1000;
                         String fanSpd = fanSpdStr[jd.getInteger("fanSpd")];
                         Float feeRate = jd.getFloat("feeRate");
@@ -397,19 +398,28 @@ public class ServerUI {
                         vectors.removeAllElements();
                         tableModel.fireTableStructureChanged();
                         JSONArray datas = j.getJSONArray("data");
-                        String[] onStr = new String[]{"开机","关机"};
+                        String[] onStr = new String[]{"服务中","等待响应","回温待机","关机"};
                         String[] fanSpdStr = new String[]{"低","中","高"};
                         for (int i = 0; i < datas.size(); i++) {
                             JSONObject jd = datas.getJSONObject(i);
                             String rmId = jd.getString("rmId");
-                            String on = onStr[jd.getBoolean("on") ? 0 : 1];
+                            int state = jd.getInteger("state");
+                            String stateStr = onStr[state];
+                            long waitTime = jd.getLong("waitTime");
+                            if (state == 1) {
+                                if (waitTime > 0) {
+                                    stateStr += "，RR计时:" + (waitTime/1000) + "s";
+                                } else {
+                                    stateStr += "，RR取消";
+                                }
+                            }
                             Float currT = jd.getFloat("currT");
                             int targetT = jd.getInteger("targetT");
                             String fanSpd = fanSpdStr[jd.getInteger("fanSpd")];
                             Float fee = jd.getFloat("fee");
                             Vector<Object> v = new Vector<>();
                             v.add(rmId);
-                            v.add(on);
+                            v.add(stateStr);
                             v.add(currT);
                             v.add(targetT);
                             v.add(fanSpd);
@@ -509,7 +519,7 @@ public class ServerUI {
                     Server.on = false;
                     JOptionPane.showMessageDialog(
                             frame,
-                            "关闭远程服务器出错，请手动关闭!",
+                            "关闭远程服务器出错，请人工核查!",
                             "WarnMsg",
                             JOptionPane.WARNING_MESSAGE
                     );

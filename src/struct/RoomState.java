@@ -7,7 +7,7 @@ package struct;
  * @since 9 June 2020
  */
 public class RoomState {
-    private boolean on;
+    private int state;
     private String id;
     private String rmId;
     private float fee;
@@ -16,9 +16,10 @@ public class RoomState {
     private int fanSpeed;
     private int targetTemp;
     private float currentTemp;
+    private long waitTime;
 
-    public RoomState(boolean on, String id, String rmId, float fee, float feeRate, long duration, int fanSpeed, int targetTemp, float currentTemp) {
-        this.on = on;
+    public RoomState(int state, String id, String rmId, float fee, float feeRate, long duration, int fanSpeed, int targetTemp, float currentTemp, long waitTime) {
+        this.state = state;
         this.id = id;
         this.rmId = rmId;
         this.fee = fee;
@@ -27,14 +28,15 @@ public class RoomState {
         this.fanSpeed = fanSpeed;
         this.targetTemp = targetTemp;
         this.currentTemp = currentTemp;
+        this.waitTime = waitTime;
     }
 
-    public boolean isOn() {
-        return on;
+    public int getState() {
+        return state;
     }
 
-    public void setOn(boolean on) {
-        this.on = on;
+    public void setState(int state) {
+        this.state = state;
     }
 
     public String getId() {
@@ -99,5 +101,13 @@ public class RoomState {
 
     public void setCurrentTemp(float currentTemp) {
         this.currentTemp = currentTemp;
+    }
+
+    public long getWaitTime() {
+        return waitTime;
+    }
+
+    public void setWaitTime(long waitTime) {
+        this.waitTime = waitTime;
     }
 }
